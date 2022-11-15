@@ -24,8 +24,17 @@
     font-size: 30pt;
     color: rgb(91, 91, 91);
     margin-top: -600px;
-    width: 100%;
+    width: 200rem;
     height: 80px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.map {
+    position: absolute;
+    width: 70rem;
+    margin-top: 80px;
     align-items: center;
     display: flex;
     justify-content: center;

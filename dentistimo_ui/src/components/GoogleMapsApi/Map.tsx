@@ -6,6 +6,7 @@ import {
   useLoadScript
 } from "@react-google-maps/api";
 import { container, locationOnLoad } from "./mapSettings";
+import dentistries from '../../data/dentistries.json';
 
 const Map: React.FC = () => {
     const { isLoaded } = useLoadScript({
@@ -19,6 +20,7 @@ const Map: React.FC = () => {
     const onUnMount = (): void => {
         mapReference.current = null;
     };
+
     if (!isLoaded) return <div>Loading</div>;
     return (
         <GoogleMap
@@ -26,7 +28,17 @@ const Map: React.FC = () => {
             center={locationOnLoad}
             onUnmount={onUnMount}
             zoom={11}
-        />
+        >
+        {
+            dentistries.map(dentistry => {
+              return (
+                  <Marker
+                      key={dentistry.name}
+                      position={dentistry.coordinate}/>
+              )
+            })
+         }
+        </GoogleMap>
   );
 };
 

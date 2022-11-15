@@ -12,7 +12,9 @@ const Appointments: React.FunctionComponent<IAppointmentProps> = () => {
                 <div className='title'>
                     Book an appointment
                 </div>
-                <Map />
+                <div className='map'>
+                    <Map />
+                </div>
             </div>
         </div>
     )
