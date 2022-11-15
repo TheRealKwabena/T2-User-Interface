@@ -1,0 +1,33 @@
+.container {
+    height: 1000px;
+    background-color: #EEEEEE;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 8px;
+    align-items: center;
+    display: flex;
+    background-color: white;
+    width: 70rem;
+    height: 100%;
+    padding: 40px;
+    position:absolute;
+}
+
+.title {
+    font-family: Roboto;
+    font-size: 30pt;
+    color: rgb(91, 91, 91);
+    margin-top: -600px;
+    width: 100%;
+    height: 80px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
