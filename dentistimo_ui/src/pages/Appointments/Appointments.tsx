@@ -1,8 +1,7 @@
-import { Card } from '@material-ui/core';
 import React, { useState } from 'react';
 import './Appointments.css';
 import Map from '../../components/GoogleMapsApi/Map';
-import DentistryCard from '../../components/ListOfDentistries/ListOfDentistries';
+import dentistries from '../../data/dentistries.json';
 
 
 
@@ -16,9 +15,16 @@ const Appointments: React.FC = () => {
                 </div>
                 <div className='map'>
                     <Map />
-                </div>
-                <div className='dentistry_card'>
-                    <DentistryCard />
+                    <div className='dentistry_container'>
+                        {
+                            dentistries.map((dentistry, index) => (
+                                <div className='dentistry_card' key={index}>
+                                    <p className='name'> Name: {dentistry.name}</p>
+                                    <p className='address'> Address: {dentistry.address}</p>
+                                    <p className='dentists'> Dentists: {dentistry.dentists}</p>
+                                </div>
+                        ))}            
+                    </div>
                 </div>
             </div>
         </div>
