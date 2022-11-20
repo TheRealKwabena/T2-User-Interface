@@ -21,8 +21,9 @@
 
 .map {
     width: 60rem;
-    height: 57rem;
-    background-color: rgb(252, 252, 252);
+    height: 65rem;
+    background-color: #FDFDFD96;
+    max-height: 100%;
 }
 
 .dentistry_container {
@@ -54,4 +55,11 @@ p {
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-left: 1rem;
     font-size: large;
+}
+
+.search_bar_container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
 }

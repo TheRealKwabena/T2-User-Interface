@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Appointments.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import dentistries from '../../data/dentistries.json';
+import SearchBar from '../../components/SearchBar/SearchBar';
 
 
 
@@ -14,6 +15,9 @@ const Appointments: React.FC = () => {
                     Book an appointment
                 </div>
                 <div className='map'>
+                    <div className='search_bar_container'>
+                        <SearchBar />
+                    </div>
                     <Map />
                     <div className='dentistry_container'>
                         {
