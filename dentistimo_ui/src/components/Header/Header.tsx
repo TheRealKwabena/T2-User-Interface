@@ -1,7 +1,7 @@
 import {useState} from 'react'
 import { Nav, NavbarContainer, LogoContainer, PagesContainer, LinkContainer } from './HeaderElements';
-import { Drawer, Box, Typography, IconButton } from '@mui/material'
 import { Logo } from './logo/LogoStyle';
+import {Link} from 'react-scroll';
 
 export interface IHeaderProps {}
 
@@ -13,24 +13,31 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
         <NavbarContainer>
           <LogoContainer to='/'>
             <Logo src={require("./logo/image.png")} />
-              <div className="text-xl" style={{
-                backgroundColor: 'blue',
-              }}>
-                <div style={{backgroundColor: 'blue'}} onClick={() => {setIsDrawerOpen(!isDrawerOpen)}}></div>
-              </div>
             <PagesContainer>
-              <LinkContainer to={`/appointments`}>
-                Appointments
-              </LinkContainer>
-              <LinkContainer to={`/dentistries`}>
-                Dentistries
-              </LinkContainer>
-              <LinkContainer to={`/about`}>
-                About
-              </LinkContainer>
+              <Link to='appointments' smooth={true} offset={-110} duration={900}>
+                <LinkContainer to={`/`}>
+                  Appointments
+                </LinkContainer>
+              </Link>
+              <Link to='dentistries' smooth={true} offset={-110} duration={900}>
+                <LinkContainer to={`/`}>
+                  Dentistries
+                </LinkContainer>
+              </Link>
+              <Link to='appointments2' smooth={true} offset={-110} duration={900}>
+                <LinkContainer to={`/`}>
+                  About
+                </LinkContainer>
+              </Link>
               <LinkContainer to={`/login`}>
                 Login
               </LinkContainer>
+              <div className="text-xl" style={{
+                backgroundColor: 'blue',
+                display: 'flex'
+              }}>
+                <div style={{backgroundColor: 'blue'}} onClick={() => {setIsDrawerOpen(!isDrawerOpen)}}></div>
+              </div>
             </PagesContainer>
           </LogoContainer>
         </NavbarContainer>

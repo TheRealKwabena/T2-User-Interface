@@ -7,9 +7,9 @@ export const Nav = styled.nav`
     display: flex;
     justify-content: center;
     align-items: center;
-    position: sticky;
+    position: fixed;
     top: 0;
-    width: 102vw;
+    width: 99vw;
     z-index: 10;
     font-size: 1.2rem;
 `
@@ -30,17 +30,27 @@ export const NavbarContainer = styled.div`
 
 export const PagesContainer = styled.div`
     display: flex;
+    flex-direction: row;
+    width: 400px;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    margin-right: 3rem;
+    color: white;
+    text-decoration: none;
+
+    @media screen and (max-width: 680px) {
+        display: none;
+    }
 `
 
 export const LinkContainer = styled(Link)`
     margin-right: 3rem;
     color: white;
+    text-decoration: none;
 
     @media screen and (max-width: 680px) {
         display: none;
-    }
+    }    
 `
 
 export const LogoContainer = styled(Link)`
