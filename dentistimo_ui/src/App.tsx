@@ -4,6 +4,8 @@ import Login from "./pages/Login/Login";
 import Appointments from "./pages/Appointments/Appointments";
 import Landing from './pages/Landing/Landing'
 import ScrollToTop from './ScrollToTop';
+import {SignUp} from "./pages/SignUp"
+
 
 interface IAppProps {}
 
@@ -17,6 +19,7 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
           <Route path="/" element={<Landing/>}></Route>
           <Route path="/appointments" element={<Appointments/>}></Route>
           <Route path="/login" element={<Login/>}></Route>
+          <Route path="/signup" element={<SignUp/>}></Route>
         </Routes>
       </div>
     </BrowserRouter>

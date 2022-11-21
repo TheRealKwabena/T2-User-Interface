@@ -18,7 +18,11 @@ export const NavbarContainer = styled.div`
     display: flex;
     align-items: center;
     height: 80px;
+<<<<<<< HEAD
     z-index: 1;
+=======
+    margin-right: 3rem;
+>>>>>>> 7c35bc1 (added login and sign in pages)
     width: 100%;
     max-width: 1100px;
     justify-content: center;
