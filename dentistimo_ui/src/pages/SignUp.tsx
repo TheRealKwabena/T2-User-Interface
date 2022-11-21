@@ -32,7 +32,7 @@ export function SignUp(){
           <input type="password" placeholder="Enter your password "/>
       </div>
       <div className="input-area">
-          <input type="password" placeholder="Enter your password again"/>
+          <input type="password" placeholder="Confirm your"/>
       </div>
 
       <div className="pass-txt"> <a href="./Login">Already have an account? click here</a></div>
