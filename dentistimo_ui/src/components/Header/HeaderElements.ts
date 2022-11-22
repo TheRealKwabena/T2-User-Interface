@@ -18,17 +18,13 @@ export const NavbarContainer = styled.div`
     display: flex;
     align-items: center;
     height: 80px;
-<<<<<<< HEAD
-    z-index: 1;
-=======
     margin-right: 3rem;
->>>>>>> 7c35bc1 (added login and sign in pages)
     width: 100%;
     max-width: 1100px;
     justify-content: center;
     
-    @media screen and (max-width: 680px) {
-        justify-content: start;
+    @media screen and (max-width: 690px) {
+        justify-content: space-between;
     }
 `
 
@@ -41,24 +37,16 @@ export const PagesContainer = styled.div`
     margin-right: 3rem;
     color: white;
     text-decoration: none;
-
-    @media screen and (max-width: 680px) {
-        display: none;
-    }
 `
 
 export const LinkContainer = styled(Link)`
     margin-right: 3rem;
     color: white;
     text-decoration: none;
-
-    @media screen and (max-width: 680px) {
-        display: none;
-    }    
 `
 
 export const LogoContainer = styled(Link)`
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    text-decoration: none;
 `
