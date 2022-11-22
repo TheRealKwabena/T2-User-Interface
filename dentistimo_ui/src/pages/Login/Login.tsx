@@ -1,19 +1,30 @@
 import React from 'react'
-import Header from '../../components/Header/Header';
-import "../index.css";
+import "../../styles/Login.css";
 
 export interface ILoginProps {}
 
 const Login: React.FunctionComponent<ILoginProps> = (props) => {
   return (
-    <div>
-      <h1 style={{display: "flex", justifyContent: "center"}}>Login</h1>
-      <form className="login-form">
-        <input type="email" placeholder='Email' className="input-options" id="reg_email"/>
-        <input type="password" placeholder='Password' className="input-options" id="reg_pass"/>
-        <input type="button" className="input-options" value="Login" id="press-login"/>
-      </form>
+    <form className="login-form">
+    <div className="wrapper">
+      <header>Log in</header>
+
+    
+        <input className ="email" type="text" 
+        placeholder="Enter your email"></input>
+
+
+        <input className="password" type="password"
+         placeholder="Enter your password" ></input>
+    
+
+      
+    <div className="pass-txt"><a href="./SignUp">
+      Don't have an account? click here to sign up</a></div>
+    <input type="submit" value="Login"/>
     </div>
+
+  </form>
   )
 }
 

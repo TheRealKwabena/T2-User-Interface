@@ -7,7 +7,7 @@ export const Nav = styled.nav`
     display: flex;
     justify-content: center;
     align-items: center;
-    position: sticky;
+    position: fixed;
     top: 0;
     width: 100%;
     z-index: 10;
@@ -18,33 +18,35 @@ export const NavbarContainer = styled.div`
     display: flex;
     align-items: center;
     height: 80px;
-    z-index: 1;
+    margin-right: 3rem;
     width: 100%;
     max-width: 1100px;
     justify-content: center;
     
-    @media screen and (max-width: 680px) {
-        justify-content: start;
+    @media screen and (max-width: 690px) {
+        justify-content: space-between;
     }
 `
 
 export const PagesContainer = styled.div`
     display: flex;
+    flex-direction: row;
+    width: 400px;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    margin-right: 3rem;
+    color: white;
+    text-decoration: none;
 `
 
 export const LinkContainer = styled(Link)`
     margin-right: 3rem;
     color: white;
-
-    @media screen and (max-width: 680px) {
-        display: none;
-    }
+    text-decoration: none;
 `
 
 export const LogoContainer = styled(Link)`
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    text-decoration: none;
 `
