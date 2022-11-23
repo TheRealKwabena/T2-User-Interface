@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Login from "./pages/Login/Login";
-import Appointments from "./pages/Appointments/Appointments";
+import Dentistries from "./pages/Dentistries/Dentistries";
 import Landing from './pages/Landing/Landing'
 import ScrollToTop from './ScrollToTop';
 import {SignUp} from "./pages/SignUp"
@@ -17,7 +17,7 @@ const App: React.FunctionComponent<IAppProps> = (props) => {
       <div style={{marginTop: '120px'}}>
         <Routes>
           <Route path="/" element={<Landing/>}></Route>
-          <Route path="/appointments" element={<Appointments/>}></Route>
+          <Route path="/appointments" element={<Dentistries/>}></Route>
           <Route path="/login" element={<Login/>}></Route>
           <Route path="/signup" element={<SignUp/>}></Route>
         </Routes>

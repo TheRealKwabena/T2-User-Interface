@@ -9,7 +9,7 @@ export const Nav = styled.nav`
     align-items: center;
     position: fixed;
     top: 0;
-    width: 100%;
+    width: 101%;
     z-index: 10;
     font-size: 1.2rem;
 `
