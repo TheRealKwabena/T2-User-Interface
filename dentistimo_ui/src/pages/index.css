@@ -13,13 +13,39 @@
     border: 1px solid rgba(0, 0, 0, 0.4);
 }
 
+main.landing-page {
+    background-image: url(../assets/dentist.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
 #press-login {
     background-color: rgba(0, 100, 0, 0.25);
     width: 20%;
     color: black;
+    transition: 0.4s;
 }
 
 #press-login:hover {
     background-color: rgba(0, 100, 0, 0.5);
     color: white;
+    transition: 0.4s;
+}
+
+.content {
+    display: flex;
+    height: 80vh;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 100, 100, 0.3);
+    margin: 20px;
+    border-radius: 30px;
+}
+
+#footer {
+    border-radius: 0px;
+    height: 20vh;
+    background-color: rgba(9, 82, 46, 0.61);
+    text-align: center;
+    margin: 0px;
 }

@@ -1,0 +1,13 @@
+.content {
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#appointments {
+    height: 80rem;
+    width: 100%;
+    background-color: #EEEEEE;
+    border-radius: 0px;
+}

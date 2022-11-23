@@ -6,7 +6,18 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
+    height: 80px;
     width: 100%;
     background-color: green;
+}
+
+#hamburger {
+    position: absolute;
+    right: 25px;
+    padding-left: 350px;
+    background-color: transparent;
+    @media (max-width: 690px) {
+        display: none;
+    }
 }
 

@@ -1,23 +1,14 @@
-import { Card } from '@material-ui/core';
 import React from 'react';
-import './Appointments.css';
-import Map from '../../components/GoogleMapsApi/Map'
+import Calendar from '../../components/Calendar/Calendar';
 
-export interface IAppointmentProps {}
+const Appointments: React.FC = () => {
 
-const Appointments: React.FunctionComponent<IAppointmentProps> = () => {
     return (
-        <div className='container'>
-            <div className='card'>
-                <div className='title'>
-                    Book an appointment
-                </div>
-                <div className='map'>
-                    <Map />
-                </div>
-            </div>
+        <div>
+            <Calendar />
         </div>
     )
 }
+
 
 export default Appointments;
