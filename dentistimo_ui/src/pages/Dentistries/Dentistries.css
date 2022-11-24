@@ -1,5 +1,5 @@
 .container {
-    height: 80rem;
+    height: 100rem;
     width: 100%;
     background-color: #EEEEEE;
     display: flex;
@@ -22,14 +22,15 @@
 .map {
     border-radius: 12px;
     width: 60rem;
-    height: 65rem;
+    max-height: auto;
     background-color: #FDFDFD96;
     max-height: 100%;
 }
 
 .dentistry_container {
     width: 100%;
-    margin-top: 2rem;
+    margin-top: 4rem;
+    margin-bottom: 10rem;
 }
 
 .dentistry_card {
@@ -42,6 +43,7 @@
     margin-left: 3rem; 
     width: 90%;
     height: 4.5rem;
+    max-height: 10rem;
     margin-bottom: 0.2rem;
     margin-top: 1rem;
     background-color: rgb(255, 255, 255);
@@ -63,4 +65,13 @@ p {
     align-items: center;
     justify-content: center;
     padding: 3rem;
+}
+
+#accordion {
+    border-radius: 12px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    margin-bottom: 0.2rem;
+    margin-top: 1rem;
+    margin-left: 3rem; 
+    width: 90%;
 }

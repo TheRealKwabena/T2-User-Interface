@@ -6,9 +6,6 @@ import './Landing.css';
 const Landing = () => {
   return (
     <main className='landing-page'>
-      <div className='content' id="appointments2">
-          Appointments
-      </div>
       <div className='content' id="dentistries">
           <Dentistries />
       </div>
