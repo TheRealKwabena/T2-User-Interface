@@ -3,12 +3,13 @@ import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import dentistries from '../../data/dentistries.json';
 import SearchBar from '../../components/SearchBar/SearchBar';
-import Calendar from 'react-calendar';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DatePickerTime from '../../components/DatePicker/DatePicker';
+
 
 
 const Dentistries: React.FC = () => {
@@ -40,7 +41,8 @@ const Dentistries: React.FC = () => {
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
-                                        <Calendar />
+
+                                    <DatePickerTime />
                                     </Typography>
                                     </AccordionDetails>
                                 </Accordion>
