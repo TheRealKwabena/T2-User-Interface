@@ -1,8 +1,15 @@
 import '../index.css';
 import Dentistries from '../Dentistries/Dentistries';
 import './Landing.css';
+import { useEffect } from 'react';
 
-const Landing = () => {
+interface LandingProps {
+  pageName: string;
+}
+
+const Landing = (props:LandingProps) => {
+  useEffect(() => {document.title = `${props.pageName} ⋅ Dentistimo`});
+
   return (
     <>
     <main className='landing-page'>
@@ -17,4 +24,4 @@ const Landing = () => {
   )
 }
 
-export default Landing
+export default Landing;
