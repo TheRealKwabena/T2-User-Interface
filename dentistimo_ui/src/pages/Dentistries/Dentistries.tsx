@@ -13,15 +13,11 @@ import DatePickerTime from '../../components/DatePicker/DatePicker';
 
 
 const Dentistries: React.FC = () => {
- 
-
     return (
-        <div className='container'>
             <div className='card'>
                 <div className='title'>
                     Our Dentistries
                 </div>
-                <div className='map'>
                     <div className='search_bar_container'>
                         <SearchBar />
                     </div>
@@ -48,9 +44,7 @@ const Dentistries: React.FC = () => {
                                 </Accordion>
                             ))} 
                     </div>
-                </div>
             </div>
-        </div>
     )
 }
 
