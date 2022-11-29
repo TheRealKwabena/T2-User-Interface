@@ -9,7 +9,7 @@ interface LandingProps {
 }
 
 const Landing = (props:LandingProps) => {
-  useEffect(() => {document.title = `${props.pageName.toString()} ⋅ Dentistimo`});
+  useEffect(() => {document.title = `${props.pageName} ⋅ Dentistimo`});
 
   return (
     <main className='landing-page'>
