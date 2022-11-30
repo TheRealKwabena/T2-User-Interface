@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@types/google.maps": "^3.50.5",
+    "@types/react-big-calendar": "^0.38.2",
     "@types/react-calendar": "^3.9.0",
     "@types/react-datepicker": "^4.8.0",
     "@types/react-datetime-picker": "^3.4.1",
