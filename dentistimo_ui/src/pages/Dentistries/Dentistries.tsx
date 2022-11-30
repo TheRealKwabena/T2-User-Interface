@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import dentistries from '../../data/dentistries.json';
-import SearchBar from '../../components/SearchBar/SearchBar';
+import {SearchBar} from '../../components/SearchBar/SearchBar';
 import Calendar from 'react-calendar';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
