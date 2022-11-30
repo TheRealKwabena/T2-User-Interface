@@ -2,11 +2,17 @@ import React, { useState } from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import dentistries from '../../data/dentistries.json';
-import SearchBar from '../../components/SearchBar/SearchBar';
+import {SearchBar} from '../../components/SearchBar/SearchBar';
+import Calendar from 'react-calendar';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import Typography from '@mui/material/Typography';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 
-
-const Appointments: React.FC = () => {
+const Dentistries: React.FC = () => {
+ 
 
     return (
         <div className='container'>
@@ -22,12 +28,23 @@ const Appointments: React.FC = () => {
                     <div className='dentistry_container'>
                         {
                             dentistries.map((dentistry, index) => (
-                                <div className='dentistry_card' key={index}>
+                                <Accordion id='accordion' TransitionProps={{ unmountOnExit: true }}>
+                                    <AccordionSummary
+                                        expandIcon={<ExpandMoreIcon />}
+                                        aria-controls="panel1a-content"
+                                        id="panel1a-header"
+                                        >
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
                                     <p className='dentists'> Dentists: {dentistry.dentists}</p>
-                                </div>
-                        ))}            
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                    <Typography>
+                                        <Calendar />
+                                    </Typography>
+                                    </AccordionDetails>
+                                </Accordion>
+                            ))} 
                     </div>
                 </div>
             </div>
@@ -35,4 +52,4 @@ const Appointments: React.FC = () => {
     )
 }
 
-export default Appointments;
+export default Dentistries;

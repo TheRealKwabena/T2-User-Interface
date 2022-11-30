@@ -5,7 +5,6 @@ import './Calendar.css';
 const Calendar: React.FC = () => {
     const [date, setDate] = useState(new Date());
 
-
     return (
         <div className='section'>
           <div className='title'>Choose an available timeslot</div>

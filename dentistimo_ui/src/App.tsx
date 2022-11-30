@@ -6,19 +6,16 @@ import Landing from './pages/Landing/Landing'
 import ScrollToTop from './ScrollToTop';
 import {SignUp} from "./pages/SignUp"
 
-
-interface IAppProps {}
-
-const App: React.FunctionComponent<IAppProps> = (props) => {
+const App = () => {
   return (
     <BrowserRouter>
       <Header/>
       <ScrollToTop/>
       <div style={{marginTop: '120px'}}>
         <Routes>
-          <Route path="/" element={<Landing/>}></Route>
+          <Route path="/" element={<Landing pageName={'Home'}/>}></Route>
           <Route path="/appointments" element={<Dentistries/>}></Route>
-          <Route path="/login" element={<Login/>}></Route>
+          <Route path="/login" element={<Login pageName='Login'/>}></Route>
           <Route path="/signup" element={<SignUp/>}></Route>
         </Routes>
       </div>
