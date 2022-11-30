@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import './SearchBar.css';
 import { Stack, Autocomplete, TextField } from '@mui/material';
+import { borders } from '@mui/system';
 
 const dentistries = ['Tooth Fairy Dentist', 'Your Dentist', 'The Crown', 'Liseberg Dentists']
 
@@ -12,7 +13,7 @@ export const SearchBar = () => {
             <Autocomplete
             disablePortal
             id="combo-box-demo"
-            sx={{ width: 300 }}
+            sx={{ width: 300 , borderRadius: '15px' }}
             options={dentistries}
             renderInput={(params) => <TextField {...params} label='Search by name or location ...'/>}
             value={value}
