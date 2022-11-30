@@ -1,8 +1,9 @@
 
 
 export const container = {
-    width: '100%',
-    height: '50vh'
+    width: '94%',
+    height: '50vh',
+    borderRadius: '10px'
   };
   
   export const locationOnLoad = {

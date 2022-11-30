@@ -3,12 +3,16 @@ import "../../styles/Login.css";
 
 interface LoginPageProps {
   pageName: string;
+  user?: {
+    email: string, 
+    password: string
+  };
 }
 
-const Login = (props:LoginPageProps) => {
+const Login = (props: LoginPageProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  useEffect(() => {document.title = `${props.pageName.toString()} ⋅ Dentistimo`});
+  useEffect(() => {document.title = `${props.pageName} ⋅ Dentistimo`});
 
   return (
       <form className="login-form" onSubmit={() => {}}>

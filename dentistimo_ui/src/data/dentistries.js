@@ -1,5 +1,5 @@
 
- [
+ export default [
       {
         "id": 1,
         "name": "Your Dentist",
@@ -17,7 +17,15 @@
           "wednesday": "7:00-16:00",
           "thursday": "9:00-17:00",
           "friday": "9:00-15:00"
-        }
+        },
+        "appointments": [
+          {
+            "id": 0,
+            "title": 'Appointment',
+            "start": new Date(2022, 11, 1, 18, 30, 0),
+            "end": new Date(2022, 11, 1, 19, 0, 0)
+          }
+        ]
       },
       {
         "id": 2,
@@ -36,7 +44,15 @@
           "wednesday": "7:00-19:00",
           "thursday": "7:00-19:00",
           "friday": "7:00-19:00"
-        }
+        },
+        "appointments": [
+          {
+            "id": 0,
+            "title": 'Appointment',
+            "start": new Date(2022, 11, 3, 18, 30, 0),
+            "end": new Date(2022, 11, 3, 19, 0, 0)
+          }
+        ]
       },
       {
         "id": 3,

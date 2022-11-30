@@ -14,6 +14,9 @@
 }
 
 main.landing-page {
+    display: flex;
+    padding-bottom: 100px;
+    flex-direction: column;
     background-image: url(../assets/dentist.png);
     background-repeat: no-repeat;
     background-size: cover;
@@ -45,7 +48,8 @@ main.landing-page {
 #footer {
     border-radius: 0px;
     height: 20vh;
-    background-color: rgba(9, 82, 46, 0.61);
+    background-color: rgba(36, 104, 70, 0.51);
+    box-shadow: 8px 10px 15px -7px gray;
     text-align: center;
     margin: 0px;
 }
