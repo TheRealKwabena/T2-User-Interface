@@ -6,7 +6,7 @@ import {
   useLoadScript
 } from "@react-google-maps/api";
 import { container, locationOnLoad } from "./mapSettings";
-import dentistries from '../../data/dentistries';
+import { dentistries } from '../../data/dentistries';
 
 export type DentistryType = {
     name: string,

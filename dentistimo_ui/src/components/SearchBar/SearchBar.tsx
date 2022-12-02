@@ -1,7 +1,7 @@
 import React from 'react';
 import { useState } from 'react';
 import './SearchBar.css';
-import dentistries from '../../data/dentistries';
+import { dentistries } from '../../data/dentistries';
 import { Stack, Autocomplete, TextField } from '@mui/material';
 import { borders } from '@mui/system';
 

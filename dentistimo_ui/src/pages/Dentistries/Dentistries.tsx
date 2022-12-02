@@ -1,22 +1,38 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
-import dentistries from '../../data/dentistries';
+import { dentistries } from '../../data/dentistries';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Calendar, momentLocalizer } from 'react-big-calendar'
-import moment from 'moment'
-import "react-big-calendar/lib/css/react-big-calendar.css";
+import FullCalendar, { DateSelectArg } from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from '@fullcalendar/timegrid'
+import interactionPlugin from '@fullcalendar/interaction'
 
-const localizer = momentLocalizer(moment);
+
 
 const Dentistries: React.FC = () => {
-    const [myEvents, setEvents] = useState(dentistries)
 
+    const createAppointment = (selectInfo: DateSelectArg) => {
+        const title = prompt('Please write any comments') // should be changed into modal and appointment confirmation
+        const onSlotSelect = selectInfo.view.calendar
+    
+        onSlotSelect.unselect()
+    
+        if (title) {
+          onSlotSelect.addEvent({
+            id: Math.floor((Math.random() * 100) + 1).toString(),
+            title,
+            start: selectInfo.startStr,
+            end: selectInfo.endStr,
+            allDay: selectInfo.allDay
+          })
+        }
+      }
 
     return (
             <div className='card'>
@@ -29,7 +45,7 @@ const Dentistries: React.FC = () => {
                     <Map />
                     <div className='dentistry_container'>
                         {
-                            dentistries.map((dentistry, index) => (
+                            dentistries.map((dentistry: any, index: number) => (
                                 <Accordion id='accordion' TransitionProps={{ unmountOnExit: true }}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
@@ -42,16 +58,23 @@ const Dentistries: React.FC = () => {
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
+                                            
+                                    <FullCalendar
+                                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                                        headerToolbar={{
+                                        left: 'prev,next today',
+                                        center: 'title',
+                                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                        }}
+                                        initialView='dayGridMonth'
+                                        editable={true}
+                                        selectable={true}
+                                        selectMirror={true}
+                                        dayMaxEvents={true}
+                                        initialEvents={dentistry.appointments}
+                                        select={createAppointment}
+                                    />
 
-                                    <Calendar
-                                        localizer={localizer}
-                                        startAccessor="start"
-                                        endAccessor="end"
-                                        style={{ height: 600 }}
-                                        timeslots={2}
-                                        events={dentistry.appointments}
-                                        selectable
-                                        />
                                     </Typography>
                                     </AccordionDetails>
                                 </Accordion>
@@ -59,6 +82,9 @@ const Dentistries: React.FC = () => {
                     </div>
             </div>
     )
+
 }
+
+
 
 export default Dentistries;

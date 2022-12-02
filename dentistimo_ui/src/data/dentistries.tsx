@@ -1,7 +1,9 @@
+import { EventInput } from "@fullcalendar/react"
 
- export default [
+
+ export const dentistries = [
       {
-        "id": 1,
+        "id": '1',
         "name": "Your Dentist",
         "owner": "Dan Tist",
         "dentists": 3,
@@ -20,7 +22,7 @@
         },
         "appointments": [
           {
-            "id": 0,
+            "id": '0',
             "title": 'Appointment',
             "start": new Date(2022, 11, 1, 18, 30, 0),
             "end": new Date(2022, 11, 1, 19, 0, 0)
@@ -28,7 +30,7 @@
         ]
       },
       {
-        "id": 2,
+        "id": '2',
         "name": "Tooth Fairy Dentist",
         "owner": "Tooth Fairy",
         "dentists": 1,
@@ -47,7 +49,7 @@
         },
         "appointments": [
           {
-            "id": 0,
+            "id": '0',
             "title": 'Appointment',
             "start": new Date(2022, 11, 3, 18, 30, 0),
             "end": new Date(2022, 11, 3, 19, 0, 0)
@@ -55,7 +57,7 @@
         ]
       },
       {
-        "id": 3,
+        "id": '3',
         "name": "The Crown",
         "owner": "Carmen Corona",
         "dentists": 2,
@@ -74,7 +76,7 @@
         }
       },
       {
-        "id": 4,
+        "id": '4',
         "name": "Lisebergs Dentists",
         "owner": "Glen Hysén",
         "dentists": 3,
