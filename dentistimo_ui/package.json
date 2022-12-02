@@ -17,11 +17,11 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/google-maps-react": "^2.0.5",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.3",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
     "bootstrap": "^5.2.2",
     "moment": "^2.29.4",
+    "mqtt": "^4.3.7",
     "react": "^18.2.0",
     "react-big-calendar": "^1.5.2",
     "react-bootstrap": "^2.6.0",
@@ -40,7 +40,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "compile": "tsc",
+    "prepare": "npm run compile"
   },
   "eslintConfig": {
     "extends": [
@@ -62,6 +64,7 @@
   },
   "devDependencies": {
     "@types/google.maps": "^3.50.5",
+    "@types/node": "^18.11.9",
     "@types/react-big-calendar": "^0.38.2",
     "@types/react-calendar": "^3.9.0",
     "@types/react-datepicker": "^4.8.0",
