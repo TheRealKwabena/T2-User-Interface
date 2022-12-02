@@ -32,7 +32,8 @@ const Dentistries: React.FC = () => {
             allDay: selectInfo.allDay
           })
         }
-      }
+    }
+    
 
     return (
             <div className='card'>
