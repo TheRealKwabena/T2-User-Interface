@@ -23,9 +23,12 @@ import { EventInput } from "@fullcalendar/react"
         "appointments": [
           {
             "id": '0',
-            "title": 'Appointment',
-            "start": new Date(2022, 11, 1, 18, 30, 0),
-            "end": new Date(2022, 11, 1, 19, 0, 0)
+            "title": 'Unavailable',
+            "start": new Date(2022, 11, 1),
+            "end": new Date(2022, 11, 2),
+            "display": "background",
+            "selectable": false,
+            "color": 'red'
           }
         ]
       },

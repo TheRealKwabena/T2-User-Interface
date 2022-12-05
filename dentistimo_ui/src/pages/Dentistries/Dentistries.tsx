@@ -65,9 +65,9 @@ const Dentistries: React.FC = () => {
                                         headerToolbar={{
                                         left: 'prev,next today',
                                         center: 'title',
-                                        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                        right: 'timeGridWeek,timeGridDay'
                                         }}
-                                        initialView='dayGridMonth'
+                                        initialView='timeGridWeek'     
                                         editable={true}
                                         selectable={true}
                                         selectMirror={true}
