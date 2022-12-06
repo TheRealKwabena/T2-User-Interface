@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import { dentistries } from '../../data/dentistries';
@@ -12,29 +12,26 @@ import FullCalendar, { DateSelectArg } from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
-
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/Button'
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 const Dentistries: React.FC = () => {
-
+    const [modalOpen, setModalOpen] = useState(false);
+    const [bookingConfirmed, setBookingConfirmed] = useState(false);
+    
     const createAppointment = (selectInfo: DateSelectArg) => {
-        const title = prompt('Please write any comments') // should be changed into modal and appointment confirmation
         const onSlotSelect = selectInfo.view.calendar
-    
-        onSlotSelect.unselect()
-    
-        if (title) {
-          onSlotSelect.addEvent({
+
+        onSlotSelect.addEvent({
             id: Math.floor((Math.random() * 100) + 1).toString(),
-            title,
             start: selectInfo.startStr,
             end: selectInfo.endStr,
             allDay: selectInfo.allDay
-          })
-        }
+        }); 
     }
     
-
     return (
             <div className='card'>
                 <div className='title'>
@@ -45,6 +42,27 @@ const Dentistries: React.FC = () => {
                     </div>
                     <Map />
                     <div className='dentistry_container'>
+                        <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>
+                                    Book Appointment
+                                </Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                Please mention the times. (Need to add input boxes, one is disabled, that is 30mins + start).
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <div id="button" style={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    justifyContent: 'center'
+                                }}>
+                                    <Button variant='success' size='sm' onClick={() => {
+                                        setBookingConfirmed(true)
+                                    }}>Confirm Appointment</Button>
+                                </div>
+                            </Modal.Footer>
+                        </Modal>
                         {
                             dentistries.map((dentistry: any, index: number) => (
                                 <Accordion id='accordion' TransitionProps={{ unmountOnExit: true }}>
@@ -63,18 +81,46 @@ const Dentistries: React.FC = () => {
                                     <FullCalendar
                                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                                         headerToolbar={{
-                                        left: 'prev,next today',
-                                        center: 'title',
-                                        right: 'timeGridWeek,timeGridDay'
+                                            left: 'prev,next today',
+                                            center: 'title',
+                                            right: 'timeGridWeek,timeGridDay'
                                         }}
-                                        initialView='timeGridWeek'     
-                                        editable={true}
+                                        dateClick={() => createAppointment}
+                                        initialView='timeGridDay'
                                         selectable={true}
                                         selectMirror={true}
                                         dayMaxEvents={true}
                                         initialEvents={dentistry.appointments}
-                                        select={createAppointment}
-                                    />
+                                        select={(info) => {
+                                            setModalOpen(true)
+                                            createAppointment(info)
+                                        }}
+                                        eventOverlap={false}
+                                        allDaySlot={false}
+                                        slotMinTime={'08:00:00'}
+                                        slotMaxTime={'17:00:00'}
+                                        weekends={false}
+                                        defaultTimedEventDuration={'00:30'}
+                                        forceEventDuration={true}
+                                        eventSources={[
+                                            {
+                                                events: [{
+                                                    id: 'lunch',           //to be adjusted later:
+                                                    startTime: '11:00:00', //should be made flexible to the dentist's comfort
+                                                    endTime: '12:00:00',
+                                                    daysOfWeek: ['1', '2', '3', '4', '5'],
+                                                    display: 'inverse-background'
+                                                }],
+                                                constraint: {
+                                                    //need to somehow check if length of appointment is strictly
+                                                    //30 minutes, no longer
+                                                }
+                                            }  
+                                        ]}
+                                        selectOverlap={(event) => {
+                                            return event.display === 'background';
+                                        }}
+                                    /> 
 
                                     </Typography>
                                     </AccordionDetails>

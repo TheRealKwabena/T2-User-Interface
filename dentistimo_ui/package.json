@@ -5,6 +5,10 @@
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@fullcalendar/daygrid": "^5.11.3",
+    "@fullcalendar/interaction": "^5.11.3",
+    "@fullcalendar/react": "^5.11.3",
+    "@fullcalendar/timegrid": "^5.11.3",
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^5.10.15",
@@ -19,7 +23,7 @@
     "@types/jest": "^27.5.2",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",
-    "bootstrap": "^5.2.2",
+    "bootstrap": "^5.2.3",
     "moment": "^2.29.4",
     "mqtt": "^4.3.7",
     "react": "^18.2.0",
@@ -64,6 +68,7 @@
   },
   "devDependencies": {
     "@types/google.maps": "^3.50.5",
+    "@types/jquery": "^3.5.14",
     "@types/node": "^18.11.9",
     "@types/react-big-calendar": "^0.38.2",
     "@types/react-calendar": "^3.9.0",
