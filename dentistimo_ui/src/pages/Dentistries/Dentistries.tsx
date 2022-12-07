@@ -15,23 +15,24 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { start } from 'repl';
 
 
 const Dentistries: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [bookingConfirmed, setBookingConfirmed] = useState(true);
     const [appointmentInfo, setAppointmentInfo] = useState<DateSelectArg | undefined>(undefined);
+    const [eventTitle, setEventTitle] = useState<string>('');
 
     const createAppointment = async (selectInfo: DateSelectArg | undefined) => {
         console.log('creating appointment ...')
+        
         if (selectInfo !== undefined) {
             console.log(`${bookingConfirmed} should be true`)
             const onSlotSelect = selectInfo.view.calendar
             if (bookingConfirmed) {
                 onSlotSelect.addEvent({
                     id: Math.floor((Math.random() * 100) + 1).toString(),
-                    title: 'without prompt',
+                    title: eventTitle,
                     start: selectInfo.startStr,
                     end: selectInfo.endStr,
                     allDay: selectInfo.allDay
@@ -59,7 +60,14 @@ const Dentistries: React.FC = () => {
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                Please mention the times. (Need to add input boxes, one is disabled, that is 30mins + start).
+                                {/*Please mention the times. 
+                                (Need to add input boxes, one is disabled, that is 30mins + start).*/}
+                                Name: <input type="text" name="Name" id="" placeholder='Name' value={eventTitle} onChange={(e) => {
+                                    setEventTitle(e.target.value)
+                                }}/>
+                                <br></br><br></br>
+                                Start Time: <input type="time" name="StartTime" id='start-time' /*onChange={}*//>
+                                End Time: <input type="time" name="EndTime" id='end-time' /*onChange={}*//>
                             </Modal.Body>
                             <Modal.Footer>
                                 <div id="button" style={{
@@ -71,6 +79,7 @@ const Dentistries: React.FC = () => {
                                         console.log(bookingConfirmed)
                                         setBookingConfirmed(true)
                                         createAppointment(appointmentInfo)
+                                        setEventTitle('')
                                         setTimeout(() => setModalOpen(false), 200);
                                     }}>Confirm Appointment</Button>
                                 </div>
