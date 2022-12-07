@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import { dentistries } from '../../data/dentistries';
@@ -15,21 +15,31 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { start } from 'repl';
 
 
 const Dentistries: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
-    const [bookingConfirmed, setBookingConfirmed] = useState(false);
-    
-    const createAppointment = (selectInfo: DateSelectArg) => {
-        const onSlotSelect = selectInfo.view.calendar
+    const [bookingConfirmed, setBookingConfirmed] = useState(true);
+    const [appointmentInfo, setAppointmentInfo] = useState<DateSelectArg | undefined>(undefined);
 
-        onSlotSelect.addEvent({
-            id: Math.floor((Math.random() * 100) + 1).toString(),
-            start: selectInfo.startStr,
-            end: selectInfo.endStr,
-            allDay: selectInfo.allDay
-        }); 
+    const createAppointment = async (selectInfo: DateSelectArg | undefined) => {
+        console.log('creating appointment ...')
+        if (selectInfo !== undefined) {
+            console.log(`${bookingConfirmed} should be true`)
+            const onSlotSelect = selectInfo.view.calendar
+            if (bookingConfirmed) {
+                onSlotSelect.addEvent({
+                    id: Math.floor((Math.random() * 100) + 1).toString(),
+                    title: 'without prompt',
+                    start: selectInfo.startStr,
+                    end: selectInfo.endStr,
+                    allDay: selectInfo.allDay
+                });
+            } else {
+                onSlotSelect.unselect()
+            }
+        }
     }
     
     return (
@@ -58,7 +68,10 @@ const Dentistries: React.FC = () => {
                                     justifyContent: 'center'
                                 }}>
                                     <Button variant='success' size='sm' onClick={() => {
+                                        console.log(bookingConfirmed)
                                         setBookingConfirmed(true)
+                                        createAppointment(appointmentInfo)
+                                        setTimeout(() => setModalOpen(false), 200);
                                     }}>Confirm Appointment</Button>
                                 </div>
                             </Modal.Footer>
@@ -89,11 +102,15 @@ const Dentistries: React.FC = () => {
                                         initialView='timeGridDay'
                                         selectable={true}
                                         selectMirror={true}
+                                        editable={false}
                                         dayMaxEvents={true}
                                         initialEvents={dentistry.appointments}
                                         select={(info) => {
+                                            setAppointmentInfo(info)
                                             setModalOpen(true)
-                                            createAppointment(info)
+                                        }}
+                                        selectConstraint={{
+                                            end: '00:30:00'
                                         }}
                                         eventOverlap={false}
                                         allDaySlot={false}
@@ -101,6 +118,13 @@ const Dentistries: React.FC = () => {
                                         slotMaxTime={'17:00:00'}
                                         weekends={false}
                                         defaultTimedEventDuration={'00:30'}
+                                        selectAllow={(info) => {
+                                            if (info.end.getTime() - info.start.getTime() <= (30 * 60 * 1000)) {
+                                                return true
+                                            } else {
+                                                return false
+                                            }
+                                        }}
                                         forceEventDuration={true}
                                         eventSources={[
                                             {
@@ -109,7 +133,7 @@ const Dentistries: React.FC = () => {
                                                     startTime: '11:00:00', //should be made flexible to the dentist's comfort
                                                     endTime: '12:00:00',
                                                     daysOfWeek: ['1', '2', '3', '4', '5'],
-                                                    display: 'inverse-background'
+                                                    display: 'background'
                                                 }],
                                                 constraint: {
                                                     //need to somehow check if length of appointment is strictly
@@ -118,7 +142,7 @@ const Dentistries: React.FC = () => {
                                             }  
                                         ]}
                                         selectOverlap={(event) => {
-                                            return event.display === 'background';
+                                            return event.display === 'inverse-background';
                                         }}
                                     /> 
 
