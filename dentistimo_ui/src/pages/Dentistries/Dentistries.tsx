@@ -54,6 +54,14 @@ const Dentistries: React.FC = () => {
                     <Map />
                     <div className='dentistry_container'>
                         <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
+                            <form onSubmit={(e) => {
+                                        e.preventDefault()
+                                        console.log(bookingConfirmed)
+                                        setBookingConfirmed(true)
+                                        createAppointment(appointmentInfo)
+                                        setEventTitle('')
+                                        setTimeout(() => setModalOpen(false), 200);
+                                    }}>
                             <Modal.Header closeButton>
                                 <Modal.Title>
                                     Book Appointment
@@ -62,7 +70,7 @@ const Dentistries: React.FC = () => {
                             <Modal.Body>
                                 {/*Please mention the times. 
                                 (Need to add input boxes, one is disabled, that is 30mins + start).*/}
-                                Name: <input type="text" name="Name" id="" placeholder='Name' value={eventTitle} onChange={(e) => {
+                                Name: <input type="text" name="Name" id="" required placeholder='Name' value={eventTitle} onChange={(e) => {
                                     setEventTitle(e.target.value)
                                 }}/>
                                 <br></br><br></br>
@@ -75,15 +83,10 @@ const Dentistries: React.FC = () => {
                                     display: 'flex',
                                     justifyContent: 'center'
                                 }}>
-                                    <Button variant='success' size='sm' onClick={() => {
-                                        console.log(bookingConfirmed)
-                                        setBookingConfirmed(true)
-                                        createAppointment(appointmentInfo)
-                                        setEventTitle('')
-                                        setTimeout(() => setModalOpen(false), 200);
-                                    }}>Confirm Appointment</Button>
+                                    <Button type='submit' variant='success' size='sm'>Confirm Appointment</Button>
                                 </div>
                             </Modal.Footer>
+                            </form>
                         </Modal>
                         {
                             dentistries.map((dentistry: any, index: number) => (
