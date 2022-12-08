@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/Header/Header";
+import MyAppointments from "./components/myAppointments/MyAppointments";
 import Login from "./pages/Login/Login";
 import Dentistries from "./pages/Dentistries/Dentistries";
 import Landing from './pages/Landing/Landing'
@@ -10,15 +11,8 @@ const App = () => {
   return (
     <BrowserRouter>
       <Header/>
-      <ScrollToTop/>
-      <div style={{marginTop: '120px'}}>
-        <Routes>
-          <Route path="/" element={<Landing pageName={'Home'}/>}></Route>
-          <Route path="/appointments" element={<Dentistries/>}></Route>
-          <Route path="/login" element={<Login pageName='Login'/>}></Route>
-          <Route path="/signup" element={<SignUp/>}></Route>
-        </Routes>
-      </div>
+      <MyAppointments></MyAppointments>
+   
     </BrowserRouter>
   );
 };

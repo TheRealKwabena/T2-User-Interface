@@ -1,0 +1,20 @@
+.UpcomingAppointments {
+    text-align: center;
+  }
+  .contain{
+    margin-top: 200px;
+      color: white;
+      height: flexible;
+      width: 400px;
+      background: rgb(117, 233, 157);
+      border-radius: 10px;
+      text-align: center;
+      flex-direction: row;
+      margin-left: 0;
+    
+  }
+  .fragment{
+    text-decoration: dashed;
+  }
+  
+  
