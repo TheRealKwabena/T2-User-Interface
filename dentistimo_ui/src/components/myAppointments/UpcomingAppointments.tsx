@@ -67,8 +67,10 @@ function UpcomingAppointments() {
       <Container className='contain'>
         <div className="UpcomingAppointments">
           <div>
-            <h1>Dentistimo</h1>
-            <h3>Your upcoming appointmnets</h3>
+            <h1>
+
+            </h1>
+            <h3>Your upcoming appointments</h3>
 
             <br></br>
             <ListOfAppointments />

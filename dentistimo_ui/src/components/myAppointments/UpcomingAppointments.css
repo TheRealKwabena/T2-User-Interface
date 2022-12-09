@@ -1,15 +1,17 @@
 .UpcomingAppointments {
     text-align: center;
+    text-color: white;
   }
   .contain{
     margin-top: 200px;
       color: white;
       height: flexible;
       width: 400px;
-      background: rgb(117, 233, 157);
+      background:#5FC1AA;
       border-radius: 10px;
       text-align: center;
       flex-direction: row;
+      color: white;
       margin-left: 0;
     
   }
