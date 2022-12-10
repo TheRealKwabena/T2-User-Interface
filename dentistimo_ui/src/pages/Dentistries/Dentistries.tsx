@@ -15,28 +15,33 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { MQTTController } from '../../Infrastructure/MQTTController';
+import { Buffer } from 'buffer';
 
 const Dentistries: React.FC = () => {
+    window.Buffer = window.Buffer || require("buffer").Buffer;
     const [modalOpen, setModalOpen] = useState(false);
     const [bookingConfirmed, setBookingConfirmed] = useState(true);
     const [appointmentInfo, setAppointmentInfo] = useState<DateSelectArg | undefined>(undefined);
     const [eventTitle, setEventTitle] = useState<string>('');
+    const mqtt = new MQTTController();
 
     const createAppointment = async (selectInfo: DateSelectArg | undefined) => {
         console.log('creating appointment ...')
-        
+        mqtt.subscribe();
         if (selectInfo !== undefined) {
             console.log(`${bookingConfirmed} should be true`)
             const onSlotSelect = selectInfo.view.calendar
             if (bookingConfirmed) {
-                onSlotSelect.addEvent({
+                let desiredEvent = {
                     id: Math.floor((Math.random() * 100) + 1).toString(),
                     title: eventTitle,
                     start: selectInfo.startStr,
                     end: selectInfo.endStr,
                     allDay: selectInfo.allDay
-                });
+                };
+                onSlotSelect.addEvent(desiredEvent);
+                mqtt.publish('appointment/request', JSON.stringify(desiredEvent));
             } else {
                 onSlotSelect.unselect()
             }
