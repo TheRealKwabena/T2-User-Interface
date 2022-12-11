@@ -15,8 +15,8 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { MQTTController } from '../../Infrastructure/MQTTController';
-import { Buffer } from 'buffer';
+import { connectMQTT, publish } from '../../Infrastructure/PMQTTController';
+import Paho from 'paho-mqtt';
 
 const Dentistries: React.FC = () => {
     window.Buffer = window.Buffer || require("buffer").Buffer;
@@ -24,24 +24,30 @@ const Dentistries: React.FC = () => {
     const [bookingConfirmed, setBookingConfirmed] = useState(true);
     const [appointmentInfo, setAppointmentInfo] = useState<DateSelectArg | undefined>(undefined);
     const [eventTitle, setEventTitle] = useState<string>('');
-    const mqtt = new MQTTController();
+    
+    useEffect(() => {
+        try {
+            connectMQTT();
+        } catch (e) {
+            console.log(e);
+        }
+    })
 
     const createAppointment = async (selectInfo: DateSelectArg | undefined) => {
         console.log('creating appointment ...')
-        mqtt.subscribe();
         if (selectInfo !== undefined) {
             console.log(`${bookingConfirmed} should be true`)
             const onSlotSelect = selectInfo.view.calendar
             if (bookingConfirmed) {
                 let desiredEvent = {
-                    id: Math.floor((Math.random() * 100) + 1).toString(),
-                    title: eventTitle,
-                    start: selectInfo.startStr,
-                    end: selectInfo.endStr,
-                    allDay: selectInfo.allDay
+                    userId: '1274187', //authentication should add it in
+                    requestId: '10',   //to be replaced by guid
+                    dentistId: '1',    //to be replaced by fetching dentistry info
+                    issuance: Math.floor((Math.random() * 100) + 1).toString(),
+                    date: selectInfo.startStr
                 };
                 onSlotSelect.addEvent(desiredEvent);
-                mqtt.publish('appointment/request', JSON.stringify(desiredEvent));
+                publish('appointment/request', JSON.stringify(desiredEvent));
             } else {
                 onSlotSelect.unselect()
             }
