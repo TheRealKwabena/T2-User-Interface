@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UpcomingAppointments from './UpcomingAppointments'
+import {MQTTController} from '../../Infrastructure/MQTTController'
 
-function MyAppointments() {
+
+function MyAppointments(){
+
     const data = [
         {
           "Name": "Dentistimo Fernandez",
@@ -45,30 +48,23 @@ function MyAppointments() {
 
 
 
-    const onEdit = ({ id, currentTime, currentDentistry, currentDate }) => {
+    const onEdit = ({ id, currentDentistry, currentDate }) => {
         setInEditMode({
             status: true,
             rowKey: id
         })
-        setTime(currentTime);
+
         setDentistry(currentDentistry);
         setDate(currentDate);
-
     }
 
-    
-    const updateAppointment = ({ id, newTime, newDentistry, newDate }) => {
-
-
-
-
-
+    const updateAppointment = ({ id, newDentistry, newDate }) => {
     }
 
    
      
-    const onSave = ({ id, newTime, newDentistry, newDate }) => {
-        updateAppointment({ id, newTime, newDentistry, newDate });
+    const onSave = ({ id, newDentistry, newDate }) => {
+        updateAppointment({ id, newDentistry, newDate });
     }
 
     const onCancel = () => {

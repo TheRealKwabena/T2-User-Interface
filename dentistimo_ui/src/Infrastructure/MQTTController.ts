@@ -1,5 +1,7 @@
 import * as mqtt from 'mqtt'
 import { IClientOptions } from 'mqtt'
+import { convertToLocalTime } from '../../src/Domain/Utils/dateUtils';
+
 
 export class MQTTController {
 
@@ -14,31 +16,56 @@ export class MQTTController {
     }
 
     readonly client = mqtt.connect(this.options);
+    readonly mqtt_options = {qos: 1};
 
     readonly availabilityTopic = 'avaiability/#'
     readonly appointmentTopic = 'appointment/#'
     readonly appointmentResponse = 'appointment/response'
     readonly appointmentRequest = 'appointment/request'
-    readonly availabilityRequest = 'availability/request'
-    readonly availabilityResponse = 'availability/response'
+    readonly editRequest = 'edit/request'
+    readonly editResponse = 'edit/response'
+    readonly inventoryRequest = 'inventory/request'
+    readonly inventoryResponse = 'inventory/response'
 
-    appointment = '';
-
-    public subscribe() {
+    public connect() {
         this.client.on('connect', () => {
-            this.client.subscribe(this.appointmentRequest)
-            this.client.subscribe(this.availabilityResponse)
+            console.log('Client is connected to the internet');
+            this.client.subscribe(this.appointmentResponse, {qos: 1})
+            this.client.subscribe(this.editResponse, {qos: 1})
+            this.client.subscribe(this.inventoryResponse, {qos: 1})
             console.log('Client has subscribed successfully')
-        });
-    }
-
-    public publish(topic: string, responseMessage: string) {
-        this.client.on('connect',  () => {
-            this.client.publish(topic, responseMessage);
-            console.log(topic ,responseMessage)
+            this.client.on('message', (topic, message) => {
+                if(topic === this.inventoryResponse) {
+                    const answer = JSON.parse(message.toString())
+                    console.log(answer)
+                }
+            })     
         })
     }
+
+    // functon to send message to mqtt to check availability and create new appointment
+    public createAppointment = ({ id, dentistry, date }) => {
+        let newAppointment = null;
+        newAppointment = <JSON><unknown> {
+            'userId': id,
+            'requestId': dentistry,
+            'date': date
+        }
+        this.client.publish(this.appointmentRequest, JSON.stringify(newAppointment), {qos: 1});
+        // must register success or failure
+    }
+
+    public updateAppointment = ({ id, newDentistry, newDate }) => {
+        let newAppointment = null;
+        newAppointment = <JSON><unknown> {
+            'userId': id,
+            'requestId': newDentistry,
+            'date': newDate
+        }
+        this.client.publish(this.editRequest, JSON.stringify(newAppointment), {qos: 1});
+    }
+
+    public fetchInventory(){
+        this.client.publish(this.inventoryRequest, '', {qos: 1});
+    }
 }
-
-
-
