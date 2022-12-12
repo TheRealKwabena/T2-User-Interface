@@ -4,8 +4,10 @@ import { convertToLocalTime } from '../../src/Domain/Utils/dateUtils';
 
 
 export class MQTTController {
-
-    constructor(){}
+    id
+    constructor(dentistId){
+        this.id = dentistId
+    }
 
     readonly options: IClientOptions = {
         port: 8883,
@@ -65,7 +67,7 @@ export class MQTTController {
         this.client.publish(this.editRequest, JSON.stringify(newAppointment), {qos: 1});
     }
 
-    public fetchInventory(userId){
-        this.client.publish(this.inventoryRequest, userId, {qos: 1});
+    public fetchInventory(dentistId){
+        this.client.publish(this.inventoryRequest, dentistId, {qos: 1});
     }
 }

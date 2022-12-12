@@ -49,7 +49,7 @@ function MyAppointments(){
         setDentistry(currentDentistry);
         setDate(currentDate);
         setTime(currentTime);
-        //Must combine date and time before sending to backend
+        //Must combine date and time before sending to backend as Date format
     }
      
     const onSave = ({ id, newDentistry, newDate, newTime }) => {
