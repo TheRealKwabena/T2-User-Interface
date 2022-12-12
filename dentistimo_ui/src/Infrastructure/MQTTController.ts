@@ -65,7 +65,7 @@ export class MQTTController {
         this.client.publish(this.editRequest, JSON.stringify(newAppointment), {qos: 1});
     }
 
-    public fetchInventory(){
-        this.client.publish(this.inventoryRequest, '', {qos: 1});
+    public fetchInventory(userId){
+        this.client.publish(this.inventoryRequest, userId, {qos: 1});
     }
 }

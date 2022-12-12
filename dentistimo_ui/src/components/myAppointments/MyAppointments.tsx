@@ -29,7 +29,7 @@ function MyAppointments(){
         }]
 
     useEffect(() => {
-        this.MQTTController.fetchInventory(this.id); //we need to register the id of the user that is logged in
+        this.MQTTController.fetchInventory(this.MQTTController.id); 
     }, []);
 
     const [inEditMode, setInEditMode] = useState({
