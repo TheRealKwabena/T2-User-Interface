@@ -3,7 +3,9 @@ import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import UpcomingAppointments from './UpcomingAppointments'
 
-function MyAppointments() {
+
+function MyAppointments(){
+
     const data = [
         {
           "Name": "Dentistimo Fernandez",
@@ -26,14 +28,9 @@ function MyAppointments() {
           "Dentistry": "Lindholm Klinik"
         }]
 
-    const fetchInventory = () => {
-
-    }
-
     useEffect(() => {
-        fetchInventory();
+        this.MQTTController.fetchInventory(this.MQTTController.id); 
     }, []);
-
 
     const [inEditMode, setInEditMode] = useState({
         status: false,
@@ -43,35 +40,27 @@ function MyAppointments() {
     const [Date, setDate] = useState(null);
     const [Time, setTime] = useState(null);
 
-
-
-    const onEdit = ({ id, currentTime, currentDentistry, currentDate }) => {
+    const onEdit = ({ id, currentDentistry, currentDate, currentTime }) => {
         setInEditMode({
             status: true,
             rowKey: id
         })
-        setTime(currentTime);
+
         setDentistry(currentDentistry);
         setDate(currentDate);
-
+        setTime(currentTime);
+        //Must combine date and time before sending to backend as Date format
     }
-
-    
-    const updateAppointment = ({ id, newTime, newDentistry, newDate }) => {
-
-
-
-
-
-    }
-
-   
      
-    const onSave = ({ id, newTime, newDentistry, newDate }) => {
-        updateAppointment({ id, newTime, newDentistry, newDate });
+    const onSave = ({ id, newDentistry, newDate, newTime }) => {
+        this.MQTTController.updateAppointment({ id, newDentistry, newDate });
+        // Add message of success or failure
     }
 
     const onCancel = () => {
+
+        this.MQTTController.updateAppointment();
+        // Add message of success or failure
         
         setInEditMode({
             status: false,
