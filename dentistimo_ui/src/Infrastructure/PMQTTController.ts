@@ -18,7 +18,7 @@ export function subscribe(topic: string) {
 export function publish(topic: any, message: any) {
     const payload = new Paho.Message(message);
     payload.destinationName = topic;
-    client.send(payload);
+    client.send(topic, message, 1);
 }
 
 // called when the client loses its connection
