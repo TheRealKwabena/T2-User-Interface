@@ -4,8 +4,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import UpcomingAppointments from './UpcomingAppointments'
 import * as pmqtt from '../../Infrastructure/PMQTTController'
 
+export type AppointmentType = {
+    userId: Number,
+    dentistId: number,
+    time: Date,
+    date: Date,
+}
 
 function MyAppointments(){
+
+    pmqtt.connectMQTT(); 
 
     const data = [
         {
@@ -30,37 +38,38 @@ function MyAppointments(){
         }]
 
     useEffect(() => {
-        pmqtt.fetchInventory('0'); 
+        pmqtt.fetchInventory('1'); 
     }, []);
 
     const [inEditMode, setInEditMode] = useState({
         status: false,
-        rowKey: null
+        rowKey: Number
     });
-    const [Dentistry, setDentistry] = useState(null);
-    const [Date, setDate] = useState(null);
-    const [Time, setTime] = useState(null);
+    const [Dentistry, setDentistry] = useState(Number);
+    const [date, setDate] = useState(new Date());
+    const [Time, setTime] = useState(new Date());
 
-    const onEdit = ({ id, currentDentistry, currentDate, currentTime }) => {
+    
+    const onEdit = (appointment: AppointmentType) => {
         setInEditMode({
             status: true,
-            rowKey: id
+            rowKey: appointment.userId
         })
 
-        setDentistry(currentDentistry);
-        setDate(currentDate);
-        setTime(currentTime);
+        setDentistry(appointment.dentistId);
+        setDate(appointment.date);
+        setTime(appointment.time);
         //Must combine date and time before sending to backend as Date format
     }
      
-    const onSave = ({ id, newDentistry, newDate, newTime }) => {
-        pmqtt.updateAppointment(id, newDentistry, newDate);
+    const onSave = (appointment: AppointmentType) => {
+        pmqtt.updateAppointment(appointment.userId, appointment.dentistId, appointment.date);
         // Add popup of success or failure
     }
 
-    const onCancel = () => {
+    const onCancel = (appointment: AppointmentType) => {
 
-        pmqtt.updateAppointment(null, null, null);
+        pmqtt.deleteAppointment(appointment.userId, appointment.dentistId, appointment.date);
         // Add popup of success or failure
         
         setInEditMode({
@@ -131,8 +140,7 @@ function MyAppointments(){
                                                 <button
                                                     className={"btn-success"}
                                                     onClick={() => onSave({
-                                                        id: appointments.id, newTime: Time,
-                                                        newDentistry: Dentistry, newDate: Date
+                                                        id: appointments.id, newDentistry: Dentistry, newTime: Time, newDate: Date
                                                     })}
                                                 >
                                                     Save
@@ -141,7 +149,7 @@ function MyAppointments(){
                                                 <button
                                                     className={"btn-secondary"}
                                                     style={{ marginLeft: 8 }}
-                                                    onClick={() => onCancel()}
+                                                    onClick={() => onCancel({id: appointments.id, newDentistry: Dentistry, newTime: Time, newDate: Date})}
                                                 >
                                                     Cancel
                                                 </button>
@@ -153,7 +161,7 @@ function MyAppointments(){
                                                 <button
                                                     className={"btn btn-default btn-sm"}
                                                     onClick={() => onEdit({
-                                                        id: appointments.id, currentTime: appointments.Time,
+                                                        id: appointments.userId, currentTime: appointments.Time,
                                                         currentDentistry: appointments.Dentistry, currentDate: appointments.Date
                                                     })}>
                                                     <span className="glyphicon glyphicon-pencil"></span>
