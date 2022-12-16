@@ -66,8 +66,13 @@ export function createAppointment (id: String, dentistry: String, date: String) 
 }
 
 // called when deleting an appointment
-export function deleteAppointment (id: any){
-    publish("delete/appointment/request", id);
+export function deleteAppointment (id: any, newDentistry: any, newDate: any){
+    let newAppointment = <JSON><unknown> {
+        'userId': id,
+        'requestId': newDentistry,
+        'date': newDate
+    }
+    publish("delete/appointment/request", JSON.stringify(newAppointment));
 }
 
 // called when updating an appointment

@@ -5,7 +5,7 @@ import UpcomingAppointments from './UpcomingAppointments'
 import * as pmqtt from '../../Infrastructure/PMQTTController'
 
 export type AppointmentType = {
-    userId: Number,
+    userId: number,
     dentistId: number,
     time: Date,
     date: Date,
@@ -43,9 +43,9 @@ function MyAppointments(){
 
     const [inEditMode, setInEditMode] = useState({
         status: false,
-        rowKey: Number
+        rowKey: 0
     });
-    const [Dentistry, setDentistry] = useState(Number);
+    const [Dentistry, setDentistry] = useState(0);
     const [date, setDate] = useState(new Date());
     const [Time, setTime] = useState(new Date());
 
@@ -74,10 +74,10 @@ function MyAppointments(){
         
         setInEditMode({
             status: false,
-            rowKey: null
+            rowKey: 0
         })
        
-        setTime(null);
+        setTime(new Date());
     }
 
     return (
@@ -114,7 +114,7 @@ function MyAppointments(){
                                 <td>
                                     {
                                         inEditMode.status && inEditMode.rowKey === appointments.id ? (
-                                            <input type="date" value={Date}
+                                            <input type="date" value={date as String}
                                                 onChange={(event) => setDate(event.target.value)}
                                             />
                                         ) : (
