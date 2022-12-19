@@ -1,8 +1,10 @@
 import Paho from 'paho-mqtt';
 
 // Create a client instance
-const client = new Paho.Client('80a9b426b200440c81e9c17c2ba85bc2.s2.eu.hivemq.cloud', Number(8884), "clientId");
-    
+const client = new Paho.Client('e960f016875b4c75857353c7f267d899.s2.eu.hivemq.cloud', Number(8884), "clientId");
+
+export var appointments : any[];
+
 // called when the client connects
 export function onConnect() {
     // Once a connection has been made, make a subscription and send a message.
@@ -11,8 +13,8 @@ export function onConnect() {
     client.subscribe("appointment/response");
 }
 
-export function subscribe(topic: string) {
-    client.subscribe(topic);
+export function sub(topic: string, qos: any) {
+    client.subscribe(topic, {qos: qos});
 }
 
 export function publish(topic: any, message: any) {
@@ -20,6 +22,13 @@ export function publish(topic: any, message: any) {
     payload.destinationName = topic;
     client.send(payload);
 }
+
+/**
+ * new Promise((resolve, reject) => {
+ *  if (messageReceived(get/appointments/response)) {resolve()};
+ *  
+ * })
+ */
 
 // called when the client loses its connection
 export function onConnectionLost(responseObject: any) {
@@ -33,8 +42,15 @@ export function onMessageArrived(message: any) {
     if (message.destinationName === 'appointment/response') {
         console.log("appointment/response " + message.payloadString);
     } if (message.destinationName === 'appointment/request') {
-        console.log ("appointment/request " + message.payloadString)
+        console.log("appointment/request " + message.payloadString)
+    } if (message.destinationName === 'get/appointments/response') {
+        console.log(message.payloadString);
+        appointments = JSON.parse(message.payloadString);
     }
+}
+
+export function onMessageDelivered(message: any) {
+    console.log('Message sent to: ' + message.destinationName + ' , Message: ' + message.payloadString);
 }
 
 /**
@@ -49,10 +65,11 @@ export function onMessageArrived(message: any) {
 export function connectMQTT() {
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
+    client.onMessageDelivered = onMessageDelivered;
     client.connect({
         useSSL: true,
         onSuccess: onConnect,
-        userName: 'gusreinaos',
-        password: 'Mosquitto1204!' 
+        userName: 'gusasarkw@student.gu.se',
+        password: 'Twumasi123.' 
     });
 }
