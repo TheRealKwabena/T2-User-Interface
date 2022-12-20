@@ -15,7 +15,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {appointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
+import {getAppointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
 
 interface IFetchedSlot {
     id?: string | undefined;
@@ -32,7 +32,7 @@ interface IAppInfo {
 }
 
 const Dentistries: React.FC = () => {
-    const [appList, setAppList] = useState([]);
+    const [appList, setAppList] = useState<any[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [bookingConfirmed, setBookingConfirmed] = useState(true);
     const [appointmentInfo, setAppointmentInfo] = useState<IAppInfo>({slot: undefined, id: undefined});
@@ -46,7 +46,7 @@ const Dentistries: React.FC = () => {
         }
     }, []);
 
-    const createAppointment = async (selectInfo: IAppInfo) => {
+    const createAppointment = (selectInfo: IAppInfo) => {
         console.log('creating appointment ...')
         if (selectInfo.slot !== undefined) {
             console.log(`${bookingConfirmed} should be true`)
@@ -68,26 +68,28 @@ const Dentistries: React.FC = () => {
         }
     }
 
-    const getAppointments = (id: string) : IFetchedSlot[] => {
+    const fetchSlots = async (id: string) : Promise<any[]> => {
         try {
-            sub('get/appointments/response', 1);
+            sub('get/appointments/#', 1);
             publish('get/appointments/request', `{"dentistId": "${id}"}`);
-            const list: IFetchedSlot[] = appointments.map((value) => {
-                const startDate = new Date(value.date.substring(0, 19));
-                const endDate = new Date(startDate.getTime() + 30*60000);
-                return {
-                    id: value._id,
-                    title: 'Appointment',
-                    start: startDate,
-                    end: endDate,
-                    display: 'background',
-                    color: 'grey'
-                }
-            });
+            let list : any[] = [];
+            await getAppointments(id).then((val) => {
+                list = val.map((value) => {
+                    const startDate = new Date(value.date.substring(0, 19));
+                    const endDate = new Date(startDate.getTime() + 30*60000);
+                    return {
+                        title: 'Appointment',
+                        start: startDate.toISOString(),
+                        end: endDate.toISOString(),
+                        display: 'background',
+                        color: 'grey'
+                    }
+                });
+            })
             //console.log(list);
             return list;
         } catch (e) {
-            console.log('Some error detected.');
+            console.log(e);
             return [];
         }
     }
@@ -139,7 +141,11 @@ const Dentistries: React.FC = () => {
                         </Modal>
                         {
                             dentistries.map((dentistry: any, index: number) => (
-                                <Accordion id='accordion' TransitionProps={{ unmountOnExit: true }}>
+                                <Accordion id='accordion' TransitionProps={{ 
+                                    unmountOnExit: true, 
+                                }} onChange={() => {
+                                    fetchSlots(dentistry.id);
+                                }}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
@@ -148,6 +154,7 @@ const Dentistries: React.FC = () => {
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
                                     <p className='dentists'> Dentists: {dentistry.dentists}</p>
+                                    <p className="id">ID: {dentistry.id}</p>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
@@ -160,12 +167,13 @@ const Dentistries: React.FC = () => {
                                             right: 'timeGridWeek,timeGridDay'
                                         }}
                                         dateClick={() => createAppointment}
+                                        initialEvents={[]}
                                         initialView='timeGridDay'
+                                        progressiveEventRendering={true}
                                         selectable={true}
                                         selectMirror={true}
                                         editable={false}
                                         dayMaxEvents={true}
-                                        initialEvents={dentistry.appointments}
                                         select={(info) => {
                                             setAppointmentInfo({...appointmentInfo, slot: info, id: dentistry.id})
                                             setModalOpen(true)
@@ -187,7 +195,8 @@ const Dentistries: React.FC = () => {
                                             }
                                         }}
                                         forceEventDuration={true}
-                                        events={getAppointments('1')}
+                                        lazyFetching={false}
+                                        events={async () => await fetchSlots('1')}
                                         selectOverlap={(event) => {
                                             return event.display === 'inverse-background';
                                         }}

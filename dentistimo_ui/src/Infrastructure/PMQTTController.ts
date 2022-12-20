@@ -1,9 +1,9 @@
 import Paho from 'paho-mqtt';
 
 // Create a client instance
-const client = new Paho.Client('e960f016875b4c75857353c7f267d899.s2.eu.hivemq.cloud', Number(8884), "clientId");
+const client = new Paho.Client('e960f016875b4c75857353c7f267d899.s2.eu.hivemq.cloud', Number(8884), `${Math.random().toFixed(6)}`);
 
-export var appointments : any[];
+var appointments : any[];
 
 // called when the client connects
 export function onConnect() {
@@ -21,6 +21,17 @@ export function publish(topic: any, message: any) {
     const payload = new Paho.Message(message);
     payload.destinationName = topic;
     client.send(payload);
+}
+
+export function getAppointments(id: string) : Promise<any[]> {
+    return new Promise((resolve, reject) => {
+        client.subscribe("get/appointments/response", {qos: 1});
+        publish('get/appointments/request', `{"dentistId": "${id}"}`);
+        setTimeout(() => {
+            console.log(appointments);
+            resolve(appointments);
+        }, 100);
+    })
 }
 
 /**
@@ -44,7 +55,6 @@ export function onMessageArrived(message: any) {
     } if (message.destinationName === 'appointment/request') {
         console.log("appointment/request " + message.payloadString)
     } if (message.destinationName === 'get/appointments/response') {
-        console.log(message.payloadString);
         appointments = JSON.parse(message.payloadString);
     }
 }
