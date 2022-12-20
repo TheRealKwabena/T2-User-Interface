@@ -1,56 +1,77 @@
-import React, { useState } from 'react';
-import './UpcomingAppointments.css'
+import React, { useState,useEffect } from 'react';
+import './Appointments.css'
 import Table from 'react-bootstrap/Table';
+import {appointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
+import {BsCalendar2Check,BsClock, BsFillGeoAltFill,BsPersonFill} from "react-icons/bs";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container } from 'react-bootstrap';
 
-function ListOfAppointments() {
+function ListOfAppointments(){
+   const data = [
+        {
+          "requstId": "2",
+          "Date": "12/08/23 12:00",
+          "userId": "20",
+          "dentistId": "Lindholm Klinik"
+        }, {
+          "requestId": "4",
+          "Date": "12/08/23 12:00",
+          "userId": "11",
+          "dentistId": "Olofshöjd Klinik"
+        },
+        {
+          "requestId": "Dentistimo Fernandez",
+          "Date": "12/08/23 12:00",
+          "userId": "99",
+          "dentistId": "Lindholm Klinik"
+        }
+    ]    
+useEffect(() => {
+  try {
+      connectMQTT();
+      console.log('Upcoming apps connected')
+      getUpcomingApps('11');
   
- 
-
-  const data = [
-    {
-      "Name": "Dentistimo Fernandez",
-      "Date": "12/08/23",
-      "Time": "12:00",
-      "Dentistry": "Lindholm Klinik"
-    }, {
-      "Name": "Dentistimo Fernandez",
-      "Date": "12/08/23",
-      "Time": "11:00",
-      "Dentistry": "Olofshöjd Klinik"
-    },
-    {
-      "Name": "Dentistimo Fernandez",
-      "Date": "12/08/23",
-      "Time": "12:00",
-      "Dentistry": "Lindholm Klinik"
-    }
+  } catch (e) {
+      console.log(e);
+  }
+}, []);
+var tableRows:[];
+const getUpcomingApps=(userId:string)=>{
+ try{
+    sub('get/appointments/response',1);
+    publish('get/appointments/request',`{"userId": "${userId}"}`);
+    console.log('upcoming appointmnets recieved')
+    //put the data into table
     
+    const tableRows = data.map(
+      (value) => {
+        var now = new Date(value.Date)
+        var date = now.toDateString();
+        var time = now.toTimeString();
+        console.log(date + ' ' + time)
+        return (
+          <tr>
+            <td>{date}</td>
+            <td>{time}</td>
+            <td>{value.dentistId}</td>
+          </tr>
+          )})
+          return tableRows
     
-  
-  ]
-  const tableRows = data.map(
-    (appointments) => {
-      return (
-        <tr>
-          <td>{appointments.Date}</td>
-          <td>{appointments.Time}</td>
-          <td>{appointments.Dentistry}</td>
-        </tr>
+}catch (e) {
+  console.log('Some error detected.');
+  return [];}
+}
 
-      )
-    }
-  )
   return (
     <div className='upcoming-table'>
 
       <Table hover>
         <thead>
           <tr>
-            <th> <span className="glyphicon glyphicon-calendar"></span> </th>
-            <th> <span className="glyphicon glyphicon-dashboard"></span></th>
-            <th><span className="glyphicon glyphicon-map-marker"></span></th>
+            <th><BsCalendar2Check></BsCalendar2Check></th>
+            <th><BsClock></BsClock></th>
+            <th><BsFillGeoAltFill></BsFillGeoAltFill></th>
           </tr>
         </thead>
         <tbody>
@@ -64,20 +85,14 @@ function ListOfAppointments() {
 function UpcomingAppointments() {
   return (
     <React.Fragment>
-      <Container className='contain'>
-        <div className="UpcomingAppointments">
+        <div className="contain">
           <div>
-            <h1>
-
-            </h1>
-            <h3>Your upcoming appointments</h3>
-
-            <br></br>
+          <br></br>
+            <h3>Upcoming Appointments</h3>
             <ListOfAppointments />
 
           </div>
         </div>
-      </Container>
     </React.Fragment>
   );
 }

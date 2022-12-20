@@ -17,8 +17,8 @@ const SearchBar = () => {
             sx={{ width: 300 , borderRadius: '15px' }}
             options={dentistriesList}
             renderInput={(params) => <TextField {...params} label='Search by name or location ...'/>}
-            value={value}
-            onChange={(event: any, newValue: string | null) => setValue(newValue)}
+           // value={value}
+            //onChange={(event: any, newValue: string | null) => setValue(newValue)}
             freeSolo
             />
         </Stack>
