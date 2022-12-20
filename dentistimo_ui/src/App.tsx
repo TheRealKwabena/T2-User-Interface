@@ -1,10 +1,10 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/Header/Header";
-import Login from "./pages/Login/Login";
+import Login from "./pages/Authentication/Login";
 import Dentistries from "./pages/Dentistries/Dentistries";
 import Landing from './pages/Landing/Landing'
 import ScrollToTop from './ScrollToTop';
-import {SignUp} from "./pages/SignUp"
+import {SignUp} from "./pages/Authentication/SignUp"
 
 const App = () => {
   return (

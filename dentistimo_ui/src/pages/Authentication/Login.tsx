@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import "../../styles/Login.css";
+import "./Login.css";
+import { connectMQTT, publish } from '../../Infrastructure/PMQTTController';
+import { encrypt, decrypt } from "../../utils/encryptionUtils";
 
 interface LoginPageProps {
   pageName: string;
@@ -12,7 +14,26 @@ interface LoginPageProps {
 const Login = (props: LoginPageProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  useEffect(() => {document.title = `${props.pageName} ⋅ Dentistimo`});
+  useEffect(() => { document.title = `${props.pageName} ⋅ Dentistimo` });
+  
+  useEffect(() => {
+    try {
+        connectMQTT();
+    } catch (e) {
+        console.log(e);
+    }
+  })
+  
+  const logIn = async () => {
+    const loggedIn = {
+      email: email,
+      password: password
+    }
+
+    const encrypted_user = encrypt(loggedIn);
+  
+    publish('authentication/signIn/request', encrypted_user.toString());
+  }
 
   return (
       <form className="login-form" onSubmit={() => {}}>
@@ -25,7 +46,7 @@ const Login = (props: LoginPageProps) => {
               Don't have an account? Sign Up. 
               </a>
             </div>
-            <input type="submit" value="Login"/>
+            <input type="submit" value="Login" onClick={() => {logIn()}}/>
         </div>
       </form>
     ) 

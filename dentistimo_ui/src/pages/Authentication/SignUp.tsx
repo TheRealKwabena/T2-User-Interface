@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
-import "../styles/SignUp.css"
-import { publish, connectMQTT } from '../Infrastructure/PMQTTController';
-import cryptojs from 'crypto-js';
+import "./SignUp.css"
+import { publish, connectMQTT } from '../../Infrastructure/PMQTTController';
+import { encrypt, decrypt } from "../../utils/encryptionUtils";
 
 export function SignUp(){
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const private_key = process.env.REACT_APP_PRIVATE_KEY!;
+  
     useEffect(() => {
       try {
           connectMQTT();
@@ -18,13 +18,14 @@ export function SignUp(){
   
   const createUser = async () => {
     const user = {
-      jwtToken: null,
-      name,
-      email,
-      password
+      name: name,
+      email: email,
+      password: password
     }
-    const hash = cryptojs.AES.encrypt(JSON.stringify(user), private_key).toString();
-    publish('authentication/signUp/request', JSON.stringify(hash))
+
+    const encrypted_user = encrypt(user);
+
+    publish('authentication/signUp/request', encrypted_user.toString());
     }
   
     return (
