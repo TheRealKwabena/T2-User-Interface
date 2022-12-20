@@ -1,12 +1,20 @@
 import { useState, useEffect } from "react";
 import "./SignUp.css"
-import { publish, connectMQTT } from '../../Infrastructure/PMQTTController';
+import { publish, subscribe, connectMQTT } from '../../Infrastructure/PMQTTController';
 import { encrypt, decrypt } from "../../utils/encryptionUtils";
 
 export function SignUp(){
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const SIGN_UP_REQUEST_TOPIC = 'authentication/signUp/request';
+    const SIGN_UP_RESPONSE_TOPIC = 'authentication/signUp/response';
+  
+    const user = {
+      name: name,
+      email: email,
+      password: password
+  }
   
     useEffect(() => {
       try {
@@ -15,17 +23,17 @@ export function SignUp(){
           console.log(e);
       }
   })
-  
+
+
   const createUser = async () => {
-    const user = {
-      name: name,
-      email: email,
-      password: password
+    try {
+      const encrypted_user = encrypt(user);
+
+      publish(SIGN_UP_REQUEST_TOPIC, encrypted_user.toString());
+      
+    } catch (error) {
+      console.log(error);
     }
-
-    const encrypted_user = encrypt(user);
-
-    publish('authentication/signUp/request', encrypted_user.toString());
     }
   
     return (

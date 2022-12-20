@@ -14,6 +14,11 @@ interface LoginPageProps {
 const Login = (props: LoginPageProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const SIGN_IN_REQUEST_TOPIC = 'authentication/signIn/request';
+  const loggedIn = {
+    email: email,
+    password: password
+  }
   useEffect(() => { document.title = `${props.pageName} ⋅ Dentistimo` });
   
   useEffect(() => {
@@ -25,14 +30,14 @@ const Login = (props: LoginPageProps) => {
   })
   
   const logIn = async () => {
-    const loggedIn = {
-      email: email,
-      password: password
+    try {
+      const encrypted_user = encrypt(loggedIn);
+  
+      publish(SIGN_IN_REQUEST_TOPIC, encrypted_user.toString());
+    } catch (error) {
+      console.log(error);
     }
 
-    const encrypted_user = encrypt(loggedIn);
-  
-    publish('authentication/signIn/request', encrypted_user.toString());
   }
 
   return (
