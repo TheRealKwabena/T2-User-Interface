@@ -37,6 +37,9 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
               <LinkContainer to={`/login`}>
                 Login
               </LinkContainer>
+              <LinkContainer to={`/logout`}>
+                <button>Sign Out</button>
+              </LinkContainer>
             </PagesContainer>
            : 
             <NavbarContainer>

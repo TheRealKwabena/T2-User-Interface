@@ -1,8 +1,9 @@
 import Paho from 'paho-mqtt';
-
 // Create a client instance
 const client = new Paho.Client('80a9b426b200440c81e9c17c2ba85bc2.s2.eu.hivemq.cloud', Number(8884), "clientId");
-    
+client.onMessageArrived = onMessageArrived;
+
+var msg = '';
 // called when the client connects
 export function onConnect() {
     // Once a connection has been made, make a subscription and send a message.
@@ -34,7 +35,17 @@ export function onMessageArrived(message: any) {
         console.log("appointment/response " + message.payloadString);
     } if (message.destinationName === 'appointment/request') {
         console.log ("appointment/request " + message.payloadString)
+    } if (message.destinationName === 'authentication/signIn/response') {
+        msg = message.payloadString;
     }
+}
+
+export const getJWT = async () => {
+    return new Promise(() => {
+        client.subscribe('authentication/signIn/response', { qos: 1 });
+        const object = JSON.parse(msg)
+        window.localStorage.setItem('TOKEN', object.jwtToken);
+    })
 }
 
 /**
