@@ -32,7 +32,6 @@ interface IAppInfo {
 }
 
 const Dentistries: React.FC = () => {
-    const [appList, setAppList] = useState<any[]>([]);
     const [modalOpen, setModalOpen] = useState(false);
     const [bookingConfirmed, setBookingConfirmed] = useState(true);
     const [appointmentInfo, setAppointmentInfo] = useState<IAppInfo>({slot: undefined, id: undefined});
@@ -41,6 +40,7 @@ const Dentistries: React.FC = () => {
     useEffect(() => {
         try {
             connectMQTT();
+            console.log(Math.ceil(Math.random()*10000000));
         } catch (e) {
             console.log(e);
         }
@@ -72,7 +72,7 @@ const Dentistries: React.FC = () => {
         try {
             sub('get/appointments/#', 1);
             publish('get/appointments/request', `{"dentistId": "${id}"}`);
-            let list : any[] = [];
+            let list : IFetchedSlot[] = [];
             await getAppointments(id).then((val) => {
                 list = val.map((value) => {
                     const startDate = new Date(value.date.substring(0, 19));
@@ -143,8 +143,6 @@ const Dentistries: React.FC = () => {
                             dentistries.map((dentistry: any, index: number) => (
                                 <Accordion id='accordion' TransitionProps={{ 
                                     unmountOnExit: true, 
-                                }} onChange={() => {
-                                    fetchSlots(dentistry.id);
                                 }}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
@@ -169,7 +167,7 @@ const Dentistries: React.FC = () => {
                                         dateClick={() => createAppointment}
                                         initialEvents={[]}
                                         initialView='timeGridDay'
-                                        progressiveEventRendering={true}
+                                        rerenderDelay={100}
                                         selectable={true}
                                         selectMirror={true}
                                         editable={false}
@@ -196,7 +194,8 @@ const Dentistries: React.FC = () => {
                                         }}
                                         forceEventDuration={true}
                                         lazyFetching={false}
-                                        events={async () => await fetchSlots('1')}
+                                        events={async () => await fetchSlots(dentistry.id)}
+                                        eventSources={[async () => await fetchSlots(dentistry.id)]}
                                         selectOverlap={(event) => {
                                             return event.display === 'inverse-background';
                                         }}
