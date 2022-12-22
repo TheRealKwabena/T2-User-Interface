@@ -43,8 +43,31 @@ export function onMessageArrived(message: any) {
 export const getJWT = async () => {
     return new Promise(() => {
         client.subscribe('authentication/signIn/response', { qos: 1 });
-        const object = JSON.parse(msg)
-        window.localStorage.setItem('TOKEN', object.jwtToken);
+        try {
+            setTimeout(() => {
+                const object = JSON.parse(msg)
+                window.localStorage.setItem('TOKEN', object.jwtToken);
+                window.location.replace("/");
+            }, 1000)
+        } catch (error) {
+            alert('something went wrong, please try again.');
+        }
+      
+    })
+}
+
+export const getID = async () => {
+    return new Promise(() => {
+        client.subscribe('authentication/signIn/response', { qos: 1 });
+        try {
+            setTimeout(() => {
+                const object = JSON.parse(msg)
+                window.localStorage.setItem('ID', object._id);// gonna change this one to be stored in the path instead.
+            }, 1000)
+        } catch (error) {
+            alert('something went wrong, please try again.');
+        }
+      
     })
 }
 

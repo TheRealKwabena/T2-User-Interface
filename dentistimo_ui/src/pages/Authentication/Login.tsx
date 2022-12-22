@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import "./Login.css";
-import { connectMQTT, publish, getJWT } from '../../Infrastructure/PMQTTController';
+import { connectMQTT, publish, getJWT, getID } from '../../Infrastructure/PMQTTController';
 import { encrypt, decrypt } from "../../utils/encryptionUtils";
+import LoadingScreen from '../../components/LoadingScreen/LoadingScreen';
 
 interface LoginPageProps {
   pageName: string;
@@ -14,6 +15,7 @@ interface LoginPageProps {
 const Login = (props: LoginPageProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [onLoad, setOnLoad] = useState(false);
   const SIGN_IN_REQUEST_TOPIC = 'authentication/signIn/request';
 
   const loggedIn = {
@@ -36,10 +38,14 @@ const Login = (props: LoginPageProps) => {
       const encrypted_user = encrypt(loggedIn);
       publish(SIGN_IN_REQUEST_TOPIC, encrypted_user.toString());
       localStorage.clear();
-      setTimeout(() => {
-        getJWT();
-      }, 1000)
-  
+      getJWT();
+      getID();
+      if (localStorage.getItem('TOKEN') == null || localStorage.getItem('TOKEN') == undefined) {
+        setOnLoad(true);
+      } else {
+        setOnLoad(false);
+      }
+
     } catch (error) {
       console.log(error);
     }
@@ -47,9 +53,11 @@ const Login = (props: LoginPageProps) => {
 
 
   return (
-      <form className="login-form" onSubmit={() => {}}>
+    <form className="login-form" onSubmit={function( event ) {
+      event.preventDefault();
+    }}>
         <div className="wrapper">
-          <header>Log in</header>    
+        <header>Log in</header>
             <input className ="email" type="text" placeholder="Enter your email" value={email} onChange={(e) => {setEmail(e.target.value)}}></input>
             <input className="password" type="password" placeholder="Enter your password" value={password} onChange={(e) => {setPassword(e.target.value)}}></input>
             <div className="pass-txt">
@@ -57,8 +65,11 @@ const Login = (props: LoginPageProps) => {
               Don't have an account? Sign Up. 
               </a>
             </div>
-            <input type="submit" value="Login" onClick={() => {logIn()}}/>
-        </div>
+            <button value="Login" onClick={() => { logIn() }}> Log in</button>
+              <div id='loading-screen' style={onLoad ? { display: 'contents'} : {display: 'none'}}>
+                  <LoadingScreen />
+              </div>
+          </div>
       </form>
     ) 
 }

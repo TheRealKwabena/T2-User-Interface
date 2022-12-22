@@ -11,6 +11,7 @@ export interface IHeaderProps {}
 const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const reduced = useMediaQuery('(max-width: 690px)');
+  const token = localStorage.getItem('TOKEN');
 
   return (
     <Nav>
@@ -34,12 +35,7 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                   About
                 </LinkContainer>
               </Link>
-              <LinkContainer to={`/login`}>
-                Login
-              </LinkContainer>
-              <LinkContainer to={`/logout`}>
-                <button>Sign Out</button>
-              </LinkContainer>
+          {token == null || token == undefined ? <LinkContainer to={`/login`}>Login</LinkContainer> : <LinkContainer to={`/`}><button onClick={() => { window.location.reload(); localStorage.clear();}}>Sign Out</button></LinkContainer>}
             </PagesContainer>
            : 
             <NavbarContainer>

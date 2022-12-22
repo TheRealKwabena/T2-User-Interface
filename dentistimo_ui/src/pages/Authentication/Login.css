@@ -90,3 +90,8 @@
    
   }
   
+  #loading-screen {
+    position:absolute;
+    top:70%;
+    right: 48%;
+  }
