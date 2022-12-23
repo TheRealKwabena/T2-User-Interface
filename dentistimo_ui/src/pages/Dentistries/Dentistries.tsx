@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import { dentistries } from '../../data/dentistries';
@@ -15,21 +15,73 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {getAppointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
 
+interface IFetchedSlot {
+    id?: string | undefined;
+    title?: string;
+    start: Date | string;
+    end: Date | string;
+    display: string;
+    color: string;
+}
+
+interface IAppInfo {
+    slot: DateSelectArg | undefined;
+    id: string | undefined;
+}
 
 const Dentistries: React.FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
-    const [bookingConfirmed, setBookingConfirmed] = useState(false);
+    const [bookingConfirmed, setBookingConfirmed] = useState(true);
+    const [appointmentInfo, setAppointmentInfo] = useState<IAppInfo>({slot: undefined, id: undefined});
+    const [eventTitle, setEventTitle] = useState<string>('');
+    const [id, setId] = useState<string>('');
     
-    const createAppointment = (selectInfo: DateSelectArg) => {
-        const onSlotSelect = selectInfo.view.calendar
+    useEffect(() => {
+        connectMQTT();
+        console.log(Math.ceil(Math.random()*10000000));
+    }, []);
 
-        onSlotSelect.addEvent({
-            id: Math.floor((Math.random() * 100) + 1).toString(),
-            start: selectInfo.startStr,
-            end: selectInfo.endStr,
-            allDay: selectInfo.allDay
-        }); 
+    const createAppointment = (selectInfo: any | undefined, id: string | undefined) => {
+        if (selectInfo.slot !== undefined && selectInfo.string !== undefined) {
+            const onSlotSelect = selectInfo.slot.view.calendar
+            if (bookingConfirmed) {
+                let desiredEvent = {
+                    userId: '1274187', //authentication should add it in 
+                    requestId: '10',   //to be replaced by guid
+                    dentistId: id,    //to be replaced by fetching dentistry info
+                    issuance: Math.floor((Math.random() * 100) + 1).toString(),
+                    date: selectInfo.slot.startStr
+                };
+                onSlotSelect.addEvent(desiredEvent);
+                publish('appointment/request', JSON.stringify(desiredEvent));
+            } else {
+                console.log('Nothing selected.')
+            }
+        }
+    }
+
+    const fetchSlots = async (id: string) : Promise<any[]> => {
+            let list : IFetchedSlot[] = [];
+            await getAppointments(id)
+            .then((val) => {
+                list = val.map((value) => {
+                    const startDate = new Date(value.date.substring(0, 19));
+                    const endDate = new Date(startDate.getTime() + 30*60000);
+                    return {
+                        title: 'Appointment',
+                        start: startDate.toISOString(),
+                        end: endDate.toISOString(),
+                        display: 'background',
+                        color: 'grey'
+                    }
+                });
+            }).catch((e) => {
+                console.log(e);
+            })
+            //console.log(list);
+            return list;
     }
     
     return (
@@ -43,13 +95,30 @@ const Dentistries: React.FC = () => {
                     <Map />
                     <div className='dentistry_container'>
                         <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
+                            <form onSubmit={(e) => {
+                                        e.preventDefault()
+                                        console.log(bookingConfirmed)
+                                        setBookingConfirmed(true)
+                                        createAppointment(appointmentInfo.slot, appointmentInfo.id)
+                                        setEventTitle('')
+                                        setTimeout(() => {
+                                            setModalOpen(false);
+                                        }, 200);
+                                    }}>
                             <Modal.Header closeButton>
                                 <Modal.Title>
                                     Book Appointment
                                 </Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                Please mention the times. (Need to add input boxes, one is disabled, that is 30mins + start).
+                                {/*Please mention the times. 
+                                (Need to add input boxes, one is disabled, that is 30mins + start).*/}
+                                Name: <input type="text" name="Name" id="" required placeholder='Name' value={eventTitle} onChange={(e) => {
+                                    setEventTitle(e.target.value)
+                                }}/>
+                                <br></br><br></br>
+                                Start Time: <input type="time" name="StartTime" id='start-time' /*onChange={}*//>
+                                End Time: <input type="time" name="EndTime" id='end-time' /*onChange={}*//>
                             </Modal.Body>
                             <Modal.Footer>
                                 <div id="button" style={{
@@ -57,15 +126,18 @@ const Dentistries: React.FC = () => {
                                     display: 'flex',
                                     justifyContent: 'center'
                                 }}>
-                                    <Button variant='success' size='sm' onClick={() => {
-                                        setBookingConfirmed(true)
-                                    }}>Confirm Appointment</Button>
+                                    <Button type='submit' variant='success' size='sm'>Confirm Appointment</Button>
                                 </div>
                             </Modal.Footer>
+                            </form>
                         </Modal>
                         {
                             dentistries.map((dentistry: any, index: number) => (
-                                <Accordion id='accordion' TransitionProps={{ unmountOnExit: true }}>
+                                <Accordion id='accordion' TransitionProps={{ 
+                                    unmountOnExit: true, 
+                                }} onChange={() => {
+                                    setId(dentistry.id);
+                                }}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
@@ -74,6 +146,7 @@ const Dentistries: React.FC = () => {
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
                                     <p className='dentists'> Dentists: {dentistry.dentists}</p>
+                                    <p className="id">ID: {dentistry.id}</p>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
@@ -86,14 +159,26 @@ const Dentistries: React.FC = () => {
                                             right: 'timeGridWeek,timeGridDay'
                                         }}
                                         dateClick={() => createAppointment}
+                                        initialEvents={[]}
+                                        loading={(isLoading) => {
+                                            if (isLoading) {
+                                                console.log('Loading .........')
+                                            } else {
+                                                console.log('Done!');
+                                            }
+                                        }}
                                         initialView='timeGridDay'
+                                        rerenderDelay={100}
                                         selectable={true}
                                         selectMirror={true}
+                                        editable={true}
                                         dayMaxEvents={true}
-                                        initialEvents={dentistry.appointments}
                                         select={(info) => {
+                                            setAppointmentInfo({...appointmentInfo, slot: info, id: dentistry.id})
                                             setModalOpen(true)
-                                            createAppointment(info)
+                                        }}
+                                        selectConstraint={{
+                                            end: '00:30:00'
                                         }}
                                         eventOverlap={false}
                                         allDaySlot={false}
@@ -101,27 +186,20 @@ const Dentistries: React.FC = () => {
                                         slotMaxTime={'17:00:00'}
                                         weekends={false}
                                         defaultTimedEventDuration={'00:30'}
+                                        selectAllow={(info) => {
+                                            if (info.end.getTime() - info.start.getTime() <= (30 * 60 * 1000)) {
+                                                return true
+                                            } else {
+                                                return false
+                                            }
+                                        }}
                                         forceEventDuration={true}
-                                        eventSources={[
-                                            {
-                                                events: [{
-                                                    id: 'lunch',           //to be adjusted later:
-                                                    startTime: '11:00:00', //should be made flexible to the dentist's comfort
-                                                    endTime: '12:00:00',
-                                                    daysOfWeek: ['1', '2', '3', '4', '5'],
-                                                    display: 'inverse-background'
-                                                }],
-                                                constraint: {
-                                                    //need to somehow check if length of appointment is strictly
-                                                    //30 minutes, no longer
-                                                }
-                                            }  
-                                        ]}
+                                        lazyFetching={false}
+                                        events={async () => await fetchSlots(dentistry.id)}
                                         selectOverlap={(event) => {
-                                            return event.display === 'background';
+                                            return event.display === 'inverse-background';
                                         }}
                                     /> 
-
                                     </Typography>
                                     </AccordionDetails>
                                 </Accordion>

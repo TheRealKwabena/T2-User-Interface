@@ -3,48 +3,39 @@ import Table from 'react-bootstrap/Table';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BsCalendar2Check,BsClock, BsFillGeoAltFill,BsPersonFill,BsPencil,BsFillTrashFill} from "react-icons/bs";
 import UpcomingAppointments from './UpcomingAppointments'
-import {appointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
+import { getAppointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
 
 
-function MyAppointments(){
+function MyAppointments() {
     const data = [
         {
-          "requstId": "2",
-          "Date": "12/08/23 12:00",
-          "userId": "20",
-          "dentistId": "Lindholm Klinik"
-        }, {
-          "requestId": "4",
-          "Date": "12/08/23 12:00",
-          "userId": "11",
-          "dentistId": "Olofshöjd Klinik"
-        },
-        {
-          "requestId": "Dentistimo Fernandez",
-          "Date": "12/08/23 12:00",
-          "userId": "99",
-          "dentistId": "Lindholm Klinik"
+            "userId": 12345,
+            "requestId": 13,
+            "dentistId": 1,
+            "issuance": 1602406766314,
+            "date": "2024-12-14 15:02:02"
         }
     ]    
-
+var appointments=[];
    const [dat, setData]=useState([]);
    const [dentistId, setDentistId] = useState(null);
-   const [Date, setDate] = useState(null);
+   const [date, setDate] = useState(null);
    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
         try {
             connectMQTT();
-            getMyAppointments('12')
+        
+            
         } catch (e) {
-            console.log(e); }  
+            console.log('Cannot be connected'); }  
     }, []);
-
+   
     //get all appointments of a user
-    const getMyAppointments=(userId:String)=>{
+    const getMyAppointments=(Id:String)=>{
         try {
             sub('get/appointments/response', 1);
-            publish('get/appointments/request', `{"dentistId": "${userId}"}`);
+            publish('get/appointments/request', `{"dentistId": "${Id}"}`);
             setData(appointments);
             console.log(appointments)
         } catch (e) {
@@ -53,9 +44,16 @@ function MyAppointments(){
         }
     }
     //delete an appointment
-    const deleteAppointment=(requestId)=>{
+    const deleteAppointment=({requestId,newUserId, newDentistId,newDate,issuance})=>{
         try{
-            publish('delete/appointment/request',requestId)
+            let newAppointment = {
+                userId : newUserId,
+                dentistId: newDentistId,
+                date: newDate,
+                requestId:requestId,
+                issuance:issuance
+                }
+            publish('delete/appointment/request',JSON.stringify(newAppointment))
             console.log('Delete successful'+(requestId)) 
         }catch (e) {
             console.log('delete unsuccessful');    
@@ -69,6 +67,7 @@ function MyAppointments(){
          'dentistId': newDentistId,
          'date': newDate,
          'requestId':requestId,
+       
          }
         publish('edit/request',JSON.stringify(newAppointment)) 
         console.log('Edit successful'+(newAppointment));
@@ -139,10 +138,10 @@ function MyAppointments(){
                             ) : (value.dentistId  )}
                             </td>
                             <td> { inEditMode.status && inEditMode.rowKey === value.requestId ? (
-                                        <input type="datetime-local" value={Date}
+                                        <input type="datetime-local" value={date}
                                             onChange={(event) => setDate(event.target.value)} />
                                             
-                                    ) : (value.Date)}
+                                    ) : (value.date)}
                             </td>
                             <td>  {inEditMode.status && inEditMode.rowKey === value.requestId ? (
                                         <input  value={userId}
@@ -154,7 +153,7 @@ function MyAppointments(){
                                             <button className={"btn-success"}
                                              onClick={() => onSave({
                                                     requestId: value.requestId, newUserId: userId,
-                                                    newDentistId: dentistId, newDate: Date })}
+                                                    newDentistId: dentistId, newDate: date })}
                                             >Save</button>
                                             <button className={"btn-secondary"} style={{ marginLeft: 8 }}
                                                 onClick={() => onCancel()}
@@ -166,12 +165,14 @@ function MyAppointments(){
                                             <button className={"btn btn-default btn-sm"}
                                                 onClick={() => onEdit({
                                                     requestId: value.requestId, currentUserId: value.userId,
-                                                    currentDentistId: value.dentistId, currentDate: value.Date
+                                                    currentDentistId: value.dentistId, currentDate: value.date
                                                 })}>
                                                 <span><BsPencil></BsPencil></span>
                                             </button>
                                             <button className={"btn btn-default btn-sm"}
-                                            onClick={() => deleteAppointment({requestId:value.requestId})}>
+                                            onClick={() => deleteAppointment({ 
+                                                requestId: value.requestId, newUserId: value.userId,
+                                                newDentistId: value.dentistId, newDate: value.date,issuance:value.issuance})}>
                                                 <span><BsFillTrashFill></BsFillTrashFill></span>
                                             </button>
                                         </div>

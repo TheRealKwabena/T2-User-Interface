@@ -1,10 +1,11 @@
 import Paho from 'paho-mqtt';
 
 // Create a client instance
-const client = new Paho.Client('e960f016875b4c75857353c7f267d899.s2.eu.hivemq.cloud', Number(8884), "clientId");
+const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
-export var appointments : any[];
-export var upcommingApp:any[];
+var appointments : any[];
+
+var apps : any[];
 
 // called when the client connects
 export function onConnect() {
@@ -23,7 +24,34 @@ export function publish(topic: any, message: any) {
     payload.destinationName = topic;
     client.send(payload);
 }
+/*export function getApps(id: string) : Promise<any[]> {
+    return new Promise((resolve, reject) => {
+        client.subscribe("get/apps/response", {qos: 1});
+        publish('get/apps/request', `{"dentistId": "${id}"}`);
+        setTimeout(() => {
+            console.log(appointments);
+            resolve(appointments);
+        }, 400);
+    })
+}*/
 
+export function getAppointments(id: string) : Promise<any[]> {
+    return new Promise((resolve, reject) => {
+        client.subscribe("get/appointments/response", {qos: 1});
+        publish('get/appointments/request', `{"dentistId": "${id}"}`);
+        setTimeout(() => {
+            console.log(appointments);
+            resolve(appointments);
+        }, 400);
+    })
+}
+
+/**
+ * new Promise((resolve, reject) => {
+ *  if (messageReceived(get/appointments/response)) {resolve()};
+ *  
+ * })
+ */
 
 // called when the client loses its connection
 export function onConnectionLost(responseObject: any) {
@@ -38,26 +66,38 @@ export function onMessageArrived(message: any) {
         console.log("appointment/response " + message.payloadString);
     } if (message.destinationName === 'appointment/request') {
         console.log("appointment/request " + message.payloadString)
+    } if (message.destinationName === 'delete/appointment/response') {
+        console.log("delete/appointment/response " + message.payloadString);
+    } if (message.destinationName === 'appointment/request') {
+        console.log("delete/appointment/request " + message.payloadString)
     } if (message.destinationName === 'get/appointments/response') {
-        console.log(message.payloadString);
         appointments = JSON.parse(message.payloadString);
+    } if (message.destinationName === 'get/apps/response') {
+        apps = JSON.parse(message.payloadString);
     }
 }
-
 export function onMessageDelivered(message: any) {
     console.log('Message sent to: ' + message.destinationName + ' , Message: ' + message.payloadString);
 }
 
+/**
+ * Reference from PAHO DOCS -->
+ * client.subscribe("World");
+    message = new Paho.MQTT.Message("Hello");
+    message.destinationName = "World";
+    client.send(message);
+*/
 
 // connect the client
 export function connectMQTT() {
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
     client.onMessageDelivered = onMessageDelivered;
+    getAppointments('1')
     client.connect({
         useSSL: true,
         onSuccess: onConnect,
-        userName: 'gusasarkw@student.gu.se',
-        password: 'Twumasi123.' 
+        userName: 'T2Project',
+        password: 'Mamamia1234.' 
     });
 }
