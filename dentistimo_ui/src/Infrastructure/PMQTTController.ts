@@ -1,9 +1,11 @@
 import Paho from 'paho-mqtt';
+import { encrypt } from '../utils/encryptionUtils';
 // Create a client instance
 const client = new Paho.Client('80a9b426b200440c81e9c17c2ba85bc2.s2.eu.hivemq.cloud', Number(8884), "clientId");
 client.onMessageArrived = onMessageArrived;
 
-var msg = '';
+var login_response = '';
+var signout_response = '';
 // called when the client connects
 export function onConnect() {
     // Once a connection has been made, make a subscription and send a message.
@@ -36,7 +38,9 @@ export function onMessageArrived(message: any) {
     } if (message.destinationName === 'appointment/request') {
         console.log ("appointment/request " + message.payloadString)
     } if (message.destinationName === 'authentication/signIn/response') {
-        msg = message.payloadString;
+        login_response = message.payloadString;
+    } if (message.destinationName === 'authentication/signOut/response') {
+        signout_response = message.payloadString;
     }
 }
 
@@ -45,10 +49,16 @@ export const getJWT = async () => {
         client.subscribe('authentication/signIn/response', { qos: 1 });
         try {
             setTimeout(() => {
-                const object = JSON.parse(msg)
+                const object = JSON.parse(login_response)
                 window.localStorage.setItem('TOKEN', object.jwtToken);
+                window.localStorage.setItem('ID', object._id)
                 window.location.replace("/");
+
+                if (localStorage.getItem('TOKEN') === null) {
+                    alert('could not log in');
+                }
             }, 1000)
+
         } catch (error) {
             alert('something went wrong, please try again.');
         }
@@ -56,20 +66,35 @@ export const getJWT = async () => {
     })
 }
 
-export const getID = async () => {
-    return new Promise(() => {
-        client.subscribe('authentication/signIn/response', { qos: 1 });
-        try {
-            setTimeout(() => {
-                const object = JSON.parse(msg)
-                window.localStorage.setItem('ID', object._id);// gonna change this one to be stored in the path instead.
-            }, 1000)
-        } catch (error) {
-            alert('something went wrong, please try again.');
-        }
-      
-    })
+
+export const signOut = async () => {
+    try {
+        const userId = { id: localStorage.getItem('ID') }
+        const encrypted = encrypt(userId);
+        publish('authentication/signOut/request', encrypted.toString());
+        
+            return new Promise(() => {
+                client.subscribe('authentication/signOut/response', { qos: 1 });
+                try {
+                    setTimeout(() => {
+                        const response = JSON.parse(signout_response);
+    
+                        if (response.jwtToken === 'null') {//if token is received as null then clear storage and logout
+                            localStorage.clear();
+                            window.location.reload();
+                        }
+                    }, 300)
+                    
+                } catch (error) {
+                    alert(error);
+                }
+            })
+        
+    } catch (error) {
+        alert(error);
+    }
 }
+
 
 /**
  * Reference from PAHO DOCS -->

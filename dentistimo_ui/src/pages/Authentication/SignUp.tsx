@@ -30,7 +30,7 @@ export function SignUp(){
       const encrypted_user = encrypt(user);
 
       publish(SIGN_UP_REQUEST_TOPIC, encrypted_user.toString());
-      
+      alert('User created sucessfully');
     } catch (error) {
       console.log(error);
     }

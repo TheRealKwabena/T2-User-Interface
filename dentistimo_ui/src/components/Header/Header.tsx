@@ -5,6 +5,7 @@ import {Link} from 'react-scroll';
 import MenuIcon from '@mui/icons-material/Menu';
 import {Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, useMediaQuery} from '@mui/material';
 import '../styles.css';
+import { signOut } from '../../Infrastructure/PMQTTController';
 
 export interface IHeaderProps {}
 
@@ -35,7 +36,7 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                   About
                 </LinkContainer>
               </Link>
-          {token == null || token == undefined ? <LinkContainer to={`/login`}>Login</LinkContainer> : <LinkContainer to={`/`}><button onClick={() => { window.location.reload(); localStorage.clear();}}>Sign Out</button></LinkContainer>}
+          {token == null || token == undefined ? <LinkContainer to={`/login`}>Login</LinkContainer> : <LinkContainer to={`/`}><button onClick={() => { signOut(); }}>Sign Out</button></LinkContainer>}
             </PagesContainer>
            : 
             <NavbarContainer>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import "./Login.css";
-import { connectMQTT, publish, getJWT, getID } from '../../Infrastructure/PMQTTController';
+import { connectMQTT, publish, getJWT } from '../../Infrastructure/PMQTTController';
 import { encrypt, decrypt } from "../../utils/encryptionUtils";
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen';
 
@@ -39,7 +39,6 @@ const Login = (props: LoginPageProps) => {
       publish(SIGN_IN_REQUEST_TOPIC, encrypted_user.toString());
       localStorage.clear();
       getJWT();
-      getID();
       if (localStorage.getItem('TOKEN') == null || localStorage.getItem('TOKEN') == undefined) {
         setOnLoad(true);
       } else {
