@@ -43,19 +43,20 @@ const Dentistries: React.FC = () => {
         console.log(Math.ceil(Math.random()*10000000));
     }, []);
 
-    const createAppointment = (selectInfo: any | undefined, id: string | undefined) => {
-        if (selectInfo.slot !== undefined && selectInfo.string !== undefined) {
+    const createAppointment = (selectInfo: IAppInfo) => {
+        if (selectInfo.slot !== undefined && selectInfo.id !== undefined) {
             const onSlotSelect = selectInfo.slot.view.calendar
             if (bookingConfirmed) {
                 let desiredEvent = {
                     userId: '1274187', //authentication should add it in 
                     requestId: '10',   //to be replaced by guid
-                    dentistId: id,    //to be replaced by fetching dentistry info
+                    dentistId: selectInfo.id,    //to be replaced by fetching dentistry info
                     issuance: Math.floor((Math.random() * 100) + 1).toString(),
                     date: selectInfo.slot.startStr
                 };
                 onSlotSelect.addEvent(desiredEvent);
                 publish('appointment/request', JSON.stringify(desiredEvent));
+                onSlotSelect.refetchEvents();
             } else {
                 console.log('Nothing selected.')
             }
@@ -67,7 +68,7 @@ const Dentistries: React.FC = () => {
             await getAppointments(id)
             .then((val) => {
                 list = val.map((value) => {
-                    const startDate = new Date(value.date.substring(0, 19));
+                    const startDate = new Date(value.date.toString());
                     const endDate = new Date(startDate.getTime() + 30*60000);
                     return {
                         title: 'Appointment',
@@ -77,6 +78,7 @@ const Dentistries: React.FC = () => {
                         color: 'grey'
                     }
                 });
+                console.log(list);
             }).catch((e) => {
                 console.log(e);
             })
@@ -99,7 +101,7 @@ const Dentistries: React.FC = () => {
                                         e.preventDefault()
                                         console.log(bookingConfirmed)
                                         setBookingConfirmed(true)
-                                        createAppointment(appointmentInfo.slot, appointmentInfo.id)
+                                        createAppointment(appointmentInfo)
                                         setEventTitle('')
                                         setTimeout(() => {
                                             setModalOpen(false);
@@ -135,14 +137,11 @@ const Dentistries: React.FC = () => {
                             dentistries.map((dentistry: any, index: number) => (
                                 <Accordion id='accordion' TransitionProps={{ 
                                     unmountOnExit: true, 
-                                }} onChange={() => {
-                                    setId(dentistry.id);
-                                }}>
+                                }} onChange={() => setId(dentistry.id)}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
-                                        id="panel1a-header"
-                                        >
+                                        id="panel1a-header">
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
                                     <p className='dentists'> Dentists: {dentistry.dentists}</p>
@@ -168,7 +167,6 @@ const Dentistries: React.FC = () => {
                                             }
                                         }}
                                         initialView='timeGridDay'
-                                        rerenderDelay={100}
                                         selectable={true}
                                         selectMirror={true}
                                         editable={true}
@@ -176,6 +174,7 @@ const Dentistries: React.FC = () => {
                                         select={(info) => {
                                             setAppointmentInfo({...appointmentInfo, slot: info, id: dentistry.id})
                                             setModalOpen(true)
+                                            info.view.calendar.refetchEvents();
                                         }}
                                         selectConstraint={{
                                             end: '00:30:00'
@@ -195,7 +194,7 @@ const Dentistries: React.FC = () => {
                                         }}
                                         forceEventDuration={true}
                                         lazyFetching={false}
-                                        events={async () => await fetchSlots(dentistry.id)}
+                                        events={async () => await fetchSlots(id)}
                                         selectOverlap={(event) => {
                                             return event.display === 'inverse-background';
                                         }}
