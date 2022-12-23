@@ -1,7 +1,7 @@
 import Paho from 'paho-mqtt';
 
 // Create a client instance
-const client = new Paho.Client('e960f016875b4c75857353c7f267d899.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
+const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
 var appointments : any[];
 
@@ -30,7 +30,7 @@ export function getAppointments(id: string) : Promise<any[]> {
         setTimeout(() => {
             console.log(appointments);
             resolve(appointments);
-        }, 500);
+        }, 400);
     })
 }
 
@@ -79,7 +79,7 @@ export function connectMQTT() {
     client.connect({
         useSSL: true,
         onSuccess: onConnect,
-        userName: 'gusasarkw@student.gu.se',
-        password: 'Twumasi123.' 
+        userName: 'T2Project',
+        password: 'Mamamia1234.' 
     });
 }
