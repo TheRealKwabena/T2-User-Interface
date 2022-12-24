@@ -4,73 +4,60 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {BsCalendar2Check,BsClock, BsFillGeoAltFill,BsPersonFill,BsPencil,BsFillTrashFill} from "react-icons/bs";
 import UpcomingAppointments from './UpcomingAppointments'
 import { getAppointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
-
+import { time } from 'console';
 
 function MyAppointments() {
-    const data = [
-        {
-            "userId": 12345,
-            "requestId": 13,
-            "dentistId": 1,
-            "issuance": 1602406766314,
-            "date": "2024-12-14 15:02:02"
-        }
-    ]    
-var appointments=[];
-   const [dat, setData]=useState([]);
+   
+   
+   const [data, setData]=useState([]);  
    const [dentistId, setDentistId] = useState(null);
    const [date, setDate] = useState(null);
    const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        try {
-            connectMQTT();
-        
-            
-        } catch (e) {
-            console.log('Cannot be connected'); }  
+    
+            fetchMyAppointments('2')
+         
     }, []);
    
     //get all appointments of a user
-    const getMyAppointments=(Id:String)=>{
+    const fetchMyAppointments = async (id: string) => {
         try {
-            sub('get/appointments/response', 1);
-            publish('get/appointments/request', `{"dentistId": "${Id}"}`);
-            setData(appointments);
-            console.log(appointments)
+          await getAppointments(id)
+            .then(response => setData(response))
+          console.log('appointments fetched');
         } catch (e) {
-            console.log('Some error detected.');
-            return [];
+          console.log(e);
         }
-    }
+      }
     //delete an appointment
-    const deleteAppointment=({requestId,newUserId, newDentistId,newDate,issuance})=>{
+    const deleteAppointment=async({newUserId, newDentistId,newRequestId,issuance, newDate})=>{
+       
         try{
             let newAppointment = {
-                userId : newUserId,
-                dentistId: newDentistId,
-                date: newDate,
-                requestId:requestId,
-                issuance:issuance
+                'userId' : newUserId,
+                'dentistId': newDentistId,
+                'requestId':newRequestId,
+                'issuance':issuance,
+                'date': newDate
                 }
             publish('delete/appointment/request',JSON.stringify(newAppointment))
-            console.log('Delete successful'+(requestId)) 
+            console.log('Delete successful: '+(newAppointment.date)) 
         }catch (e) {
-            console.log('delete unsuccessful');    
-    }
-    }
+            console.log('delete was unsuccessful');    
+    
+    }}
+
     //update an appointment
-  const updateAppointment=({requestId, newDate, newDentistId, newUserId})=>{
+  const updateAppointment=({newUserId, newDentistId,newDate})=>{
     try{
     let newAppointment = {
          'userId': newUserId,
          'dentistId': newDentistId,
          'date': newDate,
-         'requestId':requestId,
-       
          }
         publish('edit/request',JSON.stringify(newAppointment)) 
-        console.log('Edit successful'+(newAppointment));
+        console.log('Edit successful: '+(newAppointment));
         onCancel();
     }catch (e){
         console.log('Edit unsuccessful')
@@ -83,11 +70,11 @@ var appointments=[];
         status: false,
         rowKey: null
     });
-//on Edit Mode
-    const onEdit = ({ requestId, currentDentistId, currentDate, currentUserId }) => {
+    //on Edit Mode
+    const onEdit = ({_id,currentUserId, currentDentistId, currentDate}) => {
         setInEditMode({
             status: true,
-            rowKey: requestId
+            rowKey: _id
         })
         setDentistId(currentDentistId);
         setDate(currentDate);
@@ -95,8 +82,8 @@ var appointments=[];
        
     }
      
-    const onSave = ({ requestId, newDentistId, newDate, newUserId }) => {
-        updateAppointment({requestId,newDentistId,newDate,newUserId})
+    const onSave = ({_id, newDentistId, newDate, newUserId }) => {
+        updateAppointment({newDentistId,newDate,newUserId})
       
      
     }
@@ -113,46 +100,47 @@ var appointments=[];
 
 
     return (
-        <div className="container">
+        <div>
             <div>
                 <UpcomingAppointments></UpcomingAppointments>
             </div>
-            <br></br>
             <h1 className="d-flex justify-content-center">All of your appointments</h1>
             <Table>
                 <thead>
                     <tr>
                         <th><BsFillGeoAltFill></BsFillGeoAltFill></th>
-                        <th><BsCalendar2Check></BsCalendar2Check> <BsClock></BsClock></th>
+                        <th><BsCalendar2Check></BsCalendar2Check></th>
+                        <th><BsClock></BsClock></th>
                         <th><BsPersonFill></BsPersonFill></th>
                        
                     </tr>
                 </thead>
                 <tbody>{
                      data.map((value) => (
-                        <tr key={value.requestId}>
-                            <td>{inEditMode.status && inEditMode.rowKey === value.requestId ? (
+                        <tr key={value._id}>
+                            <td>{inEditMode.status && inEditMode.rowKey === value._id ? (
                                 <input value={dentistId}
                                     onChange={(event) => setDentistId(event.target.value)}
                                 />
                             ) : (value.dentistId  )}
                             </td>
-                            <td> { inEditMode.status && inEditMode.rowKey === value.requestId ? (
-                                        <input type="datetime-local" value={date}
+                            <td> { inEditMode.status && inEditMode.rowKey === value._id ? (
+                                        <input type="text" value={date}
                                             onChange={(event) => setDate(event.target.value)} />
                                             
                                     ) : (value.date)}
                             </td>
-                            <td>  {inEditMode.status && inEditMode.rowKey === value.requestId ? (
+                         
+                            <td>  {inEditMode.status && inEditMode.rowKey === value._id ? (
                                         <input  value={userId}
                                             onChange={(event) => setUserId(event.target.value)} />
                                     ) : ( value.userId)}
                             </td>
-                            <td>{  inEditMode.status && inEditMode.rowKey === value.requestId ? (
+                            <td>{  inEditMode.status && inEditMode.rowKey === value._id? (
                                         <React.Fragment>
                                             <button className={"btn-success"}
                                              onClick={() => onSave({
-                                                    requestId: value.requestId, newUserId: userId,
+                                                    _id: value._id, newUserId: userId,
                                                     newDentistId: dentistId, newDate: date })}
                                             >Save</button>
                                             <button className={"btn-secondary"} style={{ marginLeft: 8 }}
@@ -164,15 +152,17 @@ var appointments=[];
                                         <div>
                                             <button className={"btn btn-default btn-sm"}
                                                 onClick={() => onEdit({
-                                                    requestId: value.requestId, currentUserId: value.userId,
+                                                    _id: value._id, currentUserId: value.userId,
                                                     currentDentistId: value.dentistId, currentDate: value.date
                                                 })}>
                                                 <span><BsPencil></BsPencil></span>
                                             </button>
                                             <button className={"btn btn-default btn-sm"}
-                                            onClick={() => deleteAppointment({ 
-                                                requestId: value.requestId, newUserId: value.userId,
-                                                newDentistId: value.dentistId, newDate: value.date,issuance:value.issuance})}>
+                                            onClick={() => deleteAppointment({
+                                                newUserId: value.userId,
+                                                newDentistId: value.dentistId,newRequestId:value.requestId,
+                                                issuance:value.issuance, newDate: value.date
+                                                })}>
                                                 <span><BsFillTrashFill></BsFillTrashFill></span>
                                             </button>
                                         </div>

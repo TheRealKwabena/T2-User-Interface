@@ -6,13 +6,13 @@ import MyAppointments from "./components/myAppointments/UpcomingAppointments";
 import Landing from './pages/Landing/Landing'
 import ScrollToTop from './ScrollToTop';
 import {SignUp} from "./pages/SignUp"
-import UpcomingAppointments from "./components/myAppointments/MyAppointments";
+
 
 const App = () => {
   return (
     <BrowserRouter>
       <Header/>
-     <UpcomingAppointments></UpcomingAppointments>
+<MyAppointments></MyAppointments>
     </BrowserRouter>
   );
 };

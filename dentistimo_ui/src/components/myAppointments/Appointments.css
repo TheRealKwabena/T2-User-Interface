@@ -2,7 +2,7 @@
   .contain{
     margin-top: 170px;
       color: white;
-      width: 40%;
+      width: 30%;
       margin-left: 50px;
       background:#5FC1AA;
       border-radius: 10px;
@@ -14,5 +14,7 @@
 .Table, thead, tbody,tr{
   text-align: center;
   font-size: small;
+  max-height: inherit;
+ 
+ 
 }
-  

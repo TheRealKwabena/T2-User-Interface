@@ -93,7 +93,6 @@ export function connectMQTT() {
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
     client.onMessageDelivered = onMessageDelivered;
-    getAppointments('1')
     client.connect({
         useSSL: true,
         onSuccess: onConnect,

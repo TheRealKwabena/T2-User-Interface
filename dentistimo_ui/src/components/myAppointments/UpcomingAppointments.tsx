@@ -1,57 +1,73 @@
 import React, { useState,useEffect } from 'react';
 import './Appointments.css'
 import Table from 'react-bootstrap/Table';
+import * as _ from "lodash"
 import {connectMQTT, getAppointments, publish, sub} from '../../Infrastructure/PMQTTController';
 import {BsCalendar2Check,BsClock, BsFillGeoAltFill} from "react-icons/bs";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function ListOfAppointments(){
+
+  const id='2';
+  const [data, setData]=useState([]);
   
+
     useEffect(() => {
-      try {
-      
+   
+  }, []);
 
-      
-      } catch (e) {
-          console.log('connot connect');
-      }
-    }, []);
+//gets all appointments
+  const fetchApps = async (id: string) => {
+    try {
+      await getAppointments(id)
+        .then(response => setData(response))
+      console.log('appointments fetched');
+    } catch (e) {
+      console.log(e);
+    }
+  }
+//sort the appointments
+   data.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;  }
+    });
+  
+//gets current date and day
+var currentdate = new Date();
+var todayDate = currentdate.getDay() + "/" + currentdate.getMonth() 
++ "/" + currentdate.getFullYear();
 
-    var tableRows=[];
-    const fetchApps=async(id:string)=>{
-    await getAppointments(id)
-    .then((val)=>{
-      tableRows = val.map(
-      (value) => {
-        var now = new Date(value.Date)
-        var date = now.toDateString();
-        var time = now.toTimeString();
-        console.log(date + ' ' + time)
-        return (
-          <tr>
-            <td>{date}</td>
-            <td>{time}</td>
-            <td>{value.dentistId}</td>
-          </tr>
-     ) });
-          console.log(tableRows);
-      }).catch((e) => {
-          console.log('not able to fetch apps');
-      })
-      //console.log(list);
-      return tableRows;
+
+//maps into the table
+const tableRows = data.map((value) => {
+  if((value.date.substring(0,10))<(todayDate)){
+  var dateonly = value.date.substring(0,10);
+  var timeonly = value.date.substring(11,17);
+  return(
+    <tr key={value._id}>
+      <td>{dateonly}</td>
+      <td>{timeonly}</td>
+      <td>{value.dentistId}</td>
+      
+    </tr>
+)}
+else{
+  console.log('no date matched')
+
 }
-
+})
 
   return (
     <div className='upcoming-table'>
 
-      <Table hover>
+      <Table hover className='table-up'>
         <thead>
           <tr>
             <th><BsCalendar2Check></BsCalendar2Check></th>
             <th><BsClock></BsClock></th>
             <th><BsFillGeoAltFill></BsFillGeoAltFill></th>
+       
+            
           </tr>
         </thead>
         <tbody>
@@ -66,10 +82,10 @@ function UpcomingAppointments() {
   return (
     <React.Fragment>
         <div className="contain">
-          <div>
+          <div className='child'>
           <br></br>
-            <h3>Upcoming Appointments</h3>
-            <ListOfAppointments />
+            <h4>Upcoming appointments</h4>
+            <ListOfAppointments/>
 
           </div>
         </div>
