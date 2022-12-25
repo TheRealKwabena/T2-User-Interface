@@ -30,8 +30,8 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                 </LinkContainer>
               </Link>
               <Link to='appointments2' smooth={true} offset={-110} duration={900}>
-                <LinkContainer to={`/`}>
-                  About
+                <LinkContainer to={'/myslots'}>
+                  MyBookings
                 </LinkContainer>
               </Link>
               <LinkContainer to={`/login`}>

@@ -10,7 +10,16 @@
     
   
   }
+
 .Table, thead, tbody,tr{
   text-align: center;
   font-size: small;
+}
+
+.contain {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 100px;
+  width: 80%;
 }

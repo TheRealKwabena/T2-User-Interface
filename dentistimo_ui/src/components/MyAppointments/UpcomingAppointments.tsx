@@ -1,96 +1,87 @@
 import React, { useState,useEffect } from 'react';
-import './Appointments.css'
+import './MyAppointments.css'
 import Table from 'react-bootstrap/Table';
-import {appointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
-import {BsCalendar2Check,BsClock, BsFillGeoAltFill,BsPersonFill} from "react-icons/bs";
+import {getAppointments} from '../../Infrastructure/PMQTTController';
+import {BsCalendar2Check,BsClock, BsFillGeoAltFill} from "react-icons/bs";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-function ListOfAppointments(){
-   const data = [
-        {
-          "requstId": "2",
-          "Date": "12/08/23 12:00",
-          "userId": "20",
-          "dentistId": "Lindholm Klinik"
-        }, {
-          "requestId": "4",
-          "Date": "12/08/23 12:00",
-          "userId": "11",
-          "dentistId": "Olofshöjd Klinik"
-        },
-        {
-          "requestId": "Dentistimo Fernandez",
-          "Date": "12/08/23 12:00",
-          "userId": "99",
-          "dentistId": "Lindholm Klinik"
-        }
-    ]    
-useEffect(() => {
-  try {
-      connectMQTT();
-      console.log('Upcoming apps connected')
-      getUpcomingApps('11');
+function ListOfAppointments() {
+  const id = '2';   //needs to be changed to a userId that is checked by AUTH controller
+  const [data, setData] = useState<any[]>([]);
   
-  } catch (e) {
-      console.log(e);
+  useEffect(() => {
+    fetchApps(id);
+  }, []);
+
+  //gets all appointments
+  const fetchApps = async (dentistId: string) => {
+    await getAppointments(dentistId)
+        .then(response => {
+          setData(response);
+          console.log('appointments fetched');
+        }).catch ((e) => {
+          console.log(e);
+        });
   }
-}, []);
-var tableRows:[];
-const getUpcomingApps=(userId:string)=>{
- try{
-    sub('get/appointments/response',1);
-    publish('get/appointments/request',`{"userId": "${userId}"}`);
-    console.log('upcoming appointmnets recieved')
-    //put the data into table
-    
-    const tableRows = data.map(
-      (value) => {
-        var now = new Date(value.Date)
-        var date = now.toDateString();
-        var time = now.toTimeString();
-        console.log(date + ' ' + time)
-        return (
-          <tr>
-            <td>{date}</td>
-            <td>{time}</td>
-            <td>{value.dentistId}</td>
-          </tr>
-          )})
-          return tableRows
-    
-}catch (e) {
-  console.log('Some error detected.');
-  return [];}
-}
+
+  //sort the appointments
+  data.sort((a, b) => {
+      if (a.date < b.date) {
+        return -1;  
+      } else if (a.date > b.date) {
+        return 1;
+      } else {
+        return 0;
+      }
+  });
+  
+  //gets current date and day
+  var currentDate = new Date();
+
+  //maps into the table
+  const tableRows = data.map((value) => {
+    var dateonly = value.date.substring(0,10);
+    var timeonly = value.date.substring(11,16);
+
+    return (
+      new Date(value.date) > currentDate ? 
+        (<tr key={value._id}>
+          <td>{dateonly}</td>
+          <td>{timeonly}</td>
+          <td>{value.dentistId}</td>      
+        </tr>) : (<></>)
+    );
+  })
 
   return (
     <div className='upcoming-table'>
-
-      <Table hover>
+      <br/>
+      <Table hover className='table-up'>
         <thead>
+          <button type="submit" onClick={() => fetchApps(id)}>Refresh</button>
+          <br></br>
           <tr>
             <th><BsCalendar2Check></BsCalendar2Check></th>
             <th><BsClock></BsClock></th>
-            <th><BsFillGeoAltFill></BsFillGeoAltFill></th>
+            <th><BsFillGeoAltFill></BsFillGeoAltFill></th>            
           </tr>
         </thead>
         <tbody>
           {tableRows}
         </tbody>
       </Table>
-
     </div>
-  )
+    )
 }
+
 function UpcomingAppointments() {
   return (
     <React.Fragment>
         <div className="contain">
-          <div>
+          <div className='child'>
           <br></br>
-            <h3>Upcoming Appointments</h3>
-            <ListOfAppointments />
-
+            <h4>Upcoming appointments</h4>
+            <ListOfAppointments/>
           </div>
         </div>
     </React.Fragment>

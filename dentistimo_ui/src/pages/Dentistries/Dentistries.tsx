@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import { dentistries } from '../../data/dentistries';
@@ -15,7 +15,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {getAppointments, connectMQTT, publish, sub} from '../../Infrastructure/PMQTTController';
+import {getAppointments, publish} from '../../Infrastructure/PMQTTController';
 
 interface IFetchedSlot {
     id?: string | undefined;
@@ -39,8 +39,11 @@ const Dentistries: React.FC = () => {
     const [id, setId] = useState<string>('');
     
     useEffect(() => {
-        connectMQTT();
-        console.log(Math.ceil(Math.random()*10000000));
+        try {
+            console.log(Math.ceil(Math.random()*10000000));
+        } catch (e) {
+            console.log('---');
+        }
     }, []);
 
     const createAppointment = (selectInfo: IAppInfo) => {
