@@ -4,6 +4,7 @@ import Paho from 'paho-mqtt';
 const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
 var appointments : any[];
+var deleteRes : {response: string;};
 
 // called when the client connects
 export function onConnect() {
@@ -34,6 +35,26 @@ export function getAppointments(id: string) : Promise<any[]> {
     })
 }
 
+interface apptToBeDeleted {
+    userId: string;
+    dentistId: string;
+    date: string;   
+}
+
+export function deleteAppointment(slot: apptToBeDeleted) : Promise<any> {
+    return new Promise((resolve, reject) => {
+        client.subscribe('delete/appointment/response');
+        publish('delete/appointment/request', `{"userId": "${slot.userId}", "dentistId": "${slot.dentistId}", "date": "${slot.date.replace('T', ' ')}"}`);
+        setTimeout(() => {
+            if (deleteRes.response === 'yes') {
+                resolve(deleteRes);
+            } else {
+                reject('The deletion was unsuccessful.');
+            }
+        }, 300);
+    })
+}
+
 /**
  * new Promise((resolve, reject) => {
  *  if (messageReceived(get/appointments/response)) {resolve()};
@@ -56,6 +77,8 @@ export function onMessageArrived(message: any) {
         console.log("appointment/request " + message.payloadString)
     } if (message.destinationName === 'get/appointments/response') {
         appointments = JSON.parse(message.payloadString);
+    } if (message.destinationName === 'delete/appointment/response') {
+        deleteRes = JSON.parse(message.payloadString);
     }
 }
 

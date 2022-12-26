@@ -8,62 +8,58 @@ import { getAppointments, connectMQTT, publish, sub} from '../../Infrastructure/
 import { time } from 'console';
 
 function MyAppointments() {
-   
-   
-   const [data, setData]=useState([]);  
-   const [dentistId, setDentistId] = useState(null);
-   const [date, setDate] = useState(null);
-   const [userId, setUserId] = useState(null);
+   const [data, setData] = useState<any[]>([]);  
+   const [dentistId, setDentistId] = useState<string>('');
+   const [date, setDate] = useState<string>('');
+   const [userId, setUserId] = useState<string>('');
 
     useEffect(() => {
-    
-            fetchMyAppointments('2')
-         
+        fetchMyAppointments('2') 
     }, []);
    
     //get all appointments of a user
     const fetchMyAppointments = async (id: string) => {
-        try {
-          await getAppointments(id)
-            .then(response => setData(response))
-          console.log('appointments fetched');
-        } catch (e) {
-          console.log(e);
-        }
-      }
+        await getAppointments(id)
+        .then(response => {
+            setData(response);
+            console.log('Showing all appointments....');
+        }).catch((e) => {
+            console.log(e);
+        });
+    }
+
     //delete an appointment
-    const deleteAppointment=async({newUserId, newDentistId,newRequestId,issuance, newDate})=>{
-       
-        try{
+    const deleteAppointment = async({newUserId: string, newDentistId: string, newRequestId: string, issuance: string, newDate: string}) => {
+        try {
             let newAppointment = {
                 'userId' : newUserId,
                 'dentistId': newDentistId,
-                'requestId':newRequestId,
-                'issuance':issuance,
+                'requestId': newRequestId,
+                'issuance': issuance,
                 'date': newDate
-                }
+            }
             publish('delete/appointment/request',JSON.stringify(newAppointment))
-            console.log('Delete successful: '+(newAppointment.date)) 
-        }catch (e) {
+            console.log('Delete successful: '+ (newAppointment.date)) 
+        } catch (e) {
             console.log('delete was unsuccessful');    
-    
-    }}
+        }
+    }
 
     //update an appointment
-  const updateAppointment=({newUserId, newDentistId,newDate})=>{
-    try{
-    let newAppointment = {
-         'userId': newUserId,
-         'dentistId': newDentistId,
-         'date': newDate,
-         }
-        publish('edit/request',JSON.stringify(newAppointment)) 
-        console.log('Edit successful: '+(newAppointment));
-        onCancel();
-    }catch (e){
-        console.log('Edit unsuccessful')
-  }
-  }
+    const updateAppointment=({newUserId, newDentistId,newDate})=>{
+        try {
+            let newAppointment = {
+                'userId': newUserId,
+                'dentistId': newDentistId,
+                'date': newDate,
+            }
+            publish('edit/request', JSON.stringify(newAppointment)) 
+            console.log('Edit successful: ' + (newAppointment));
+            onCancel();
+        } catch (e) {
+            console.log('Edit unsuccessful')
+        }
+    }
 
     
 
@@ -178,7 +174,5 @@ function MyAppointments() {
         </div>
     );
 }
-
-export default MyAppointments;
-
 */
+export {} //default MyAppointments;

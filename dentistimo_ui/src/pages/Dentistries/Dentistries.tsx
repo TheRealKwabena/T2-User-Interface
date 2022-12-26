@@ -8,14 +8,14 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import FullCalendar, { DateSelectArg } from '@fullcalendar/react'
+import FullCalendar, { DateSelectArg, EventClickArg } from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {getAppointments, publish} from '../../Infrastructure/PMQTTController';
+import {getAppointments, deleteAppointment, publish} from '../../Infrastructure/PMQTTController';
 
 interface IFetchedSlot {
     id?: string | undefined;
@@ -66,6 +66,25 @@ const Dentistries: React.FC = () => {
         }
     }
 
+    const deleteSlot = async (slot: EventClickArg, userId: string, dentistId: string) => {
+        if (slot !== undefined && slot.event.display === 'background' /*Change to ['block'] allow appointments of the user ONLY to be deleted*/) {
+            let deleteReq = {
+                userId: userId,
+                dentistId: dentistId,
+                date: slot.event.startStr
+            };
+            await deleteAppointment(deleteReq).then((res) => {
+                console.log('Does this work?')
+                slot.event.remove();
+                slot.view.calendar.refetchEvents();
+            }).catch((e) => {
+                console.log('Event couldnt be deleted. Error: ' + e);
+            });
+        } else {
+            console.log('Nothing is selected to delete.');
+        }
+    }
+
     const fetchSlots = async (id: string) : Promise<any[]> => {
             let list : IFetchedSlot[] = [];
             await getAppointments(id)
@@ -77,7 +96,7 @@ const Dentistries: React.FC = () => {
                         title: 'Appointment',
                         start: startDate.toISOString(),
                         end: endDate.toISOString(),
-                        display: 'background',
+                        display: /*value.userId === userId ? block :*/ 'background', // userId is a to-be useState var obtained once auth module works
                         color: 'grey'
                     }
                 });
@@ -171,8 +190,11 @@ const Dentistries: React.FC = () => {
                                         }}
                                         initialView='timeGridDay'
                                         selectable={true}
-                                        selectMirror={true}
+                                        selectMirror={false}
                                         editable={true}
+                                        eventClick={async (eventInfo) => {
+                                            await deleteSlot(eventInfo, '1274187', dentistry.id);
+                                        }}
                                         dayMaxEvents={true}
                                         select={(info) => {
                                             setAppointmentInfo({...appointmentInfo, slot: info, id: dentistry.id})
