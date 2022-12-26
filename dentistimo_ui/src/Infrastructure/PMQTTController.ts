@@ -5,8 +5,6 @@ const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cl
 
 var appointments : any[];
 
-var apps : any[];
-
 // called when the client connects
 export function onConnect() {
     // Once a connection has been made, make a subscription and send a message.
@@ -59,7 +57,7 @@ export function onConnectionLost(responseObject: any) {
         console.log("Connection Lost: " + responseObject.errorMessage);
     }
 }
-
+export var deleteResponse;
 // called when a message arrives
 export function onMessageArrived(message: any) {
     if (message.destinationName === 'appointment/response') {
@@ -67,13 +65,10 @@ export function onMessageArrived(message: any) {
     } if (message.destinationName === 'appointment/request') {
         console.log("appointment/request " + message.payloadString)
     } if (message.destinationName === 'delete/appointment/response') {
-        console.log("delete/appointment/response " + message.payloadString);
-    } if (message.destinationName === 'appointment/request') {
-        console.log("delete/appointment/request " + message.payloadString)
+        deleteResponse=message.toString();
+        console.log(deleteResponse+' this is the delete response')
     } if (message.destinationName === 'get/appointments/response') {
         appointments = JSON.parse(message.payloadString);
-    } if (message.destinationName === 'get/apps/response') {
-        apps = JSON.parse(message.payloadString);
     }
 }
 export function onMessageDelivered(message: any) {
