@@ -28,23 +28,6 @@ function MyAppointments() {
         });
     }
 
-    //delete an appointment
-    const deleteAppointment = async({newUserId: string, newDentistId: string, newRequestId: string, issuance: string, newDate: string}) => {
-        try {
-            let newAppointment = {
-                'userId' : newUserId,
-                'dentistId': newDentistId,
-                'requestId': newRequestId,
-                'issuance': issuance,
-                'date': newDate
-            }
-            publish('delete/appointment/request',JSON.stringify(newAppointment))
-            console.log('Delete successful: '+ (newAppointment.date)) 
-        } catch (e) {
-            console.log('delete was unsuccessful');    
-        }
-    }
-
     //update an appointment
     const updateAppointment=({newUserId, newDentistId,newDate})=>{
         try {
@@ -61,12 +44,11 @@ function MyAppointments() {
         }
     }
 
-    
-
     const [inEditMode, setInEditMode] = useState({
         status: false,
         rowKey: null
     });
+
     //on Edit Mode
     const onEdit = ({_id,currentUserId, currentDentistId, currentDate}) => {
         setInEditMode({

@@ -57,31 +57,11 @@ const Dentistries: React.FC = () => {
                     issuance: Math.floor((Math.random() * 100) + 1).toString(),
                     date: selectInfo.slot.startStr
                 };
-                onSlotSelect.addEvent(desiredEvent);
                 publish('appointment/request', JSON.stringify(desiredEvent));
                 onSlotSelect.refetchEvents();
             } else {
                 console.log('Nothing selected.')
             }
-        }
-    }
-
-    const deleteSlot = async (slot: EventClickArg, userId: string, dentistId: string) => {
-        if (slot !== undefined && slot.event.display === 'background' /*Change to ['block'] allow appointments of the user ONLY to be deleted*/) {
-            let deleteReq = {
-                userId: userId,
-                dentistId: dentistId,
-                date: slot.event.startStr
-            };
-            await deleteAppointment(deleteReq).then((res) => {
-                console.log('Does this work?')
-                slot.event.remove();
-                slot.view.calendar.refetchEvents();
-            }).catch((e) => {
-                console.log('Event couldnt be deleted. Error: ' + e);
-            });
-        } else {
-            console.log('Nothing is selected to delete.');
         }
     }
 
@@ -190,10 +170,10 @@ const Dentistries: React.FC = () => {
                                         }}
                                         initialView='timeGridDay'
                                         selectable={true}
-                                        selectMirror={false}
+                                        selectMirror={true}
                                         editable={true}
                                         eventClick={async (eventInfo) => {
-                                            await deleteSlot(eventInfo, '1274187', dentistry.id);
+                                            //more info about event maybe...
                                         }}
                                         dayMaxEvents={true}
                                         select={(info) => {
