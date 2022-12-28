@@ -5,7 +5,7 @@ import {Link} from 'react-scroll';
 import MenuIcon from '@mui/icons-material/Menu';
 import {Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, useMediaQuery} from '@mui/material';
 import '../styles.css';
-import { signOut } from '../../Infrastructure/PMQTTController';
+import SignOutButton from '../SignOutButton/SignOutButton';
 
 export interface IHeaderProps {}
 
@@ -23,20 +23,20 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
             <PagesContainer>
               <Link to='appointments' smooth={true} offset={-110} duration={900}>
                 <LinkContainer to={`/`}>
-                  Appointments
+                <a>Appointments</a>
                 </LinkContainer>
               </Link>
               <Link to='dentistries' smooth={true} offset={-110} duration={900}>
                 <LinkContainer to={`/`}>
-                  Dentistries
+                  <a>Dentistries</a>
                 </LinkContainer>
               </Link>
               <Link to='appointments2' smooth={true} offset={-110} duration={900}>
                 <LinkContainer to={`/`}>
-                  About
+                  <a>About</a>
                 </LinkContainer>
               </Link>
-          {token == null || token == undefined ? <LinkContainer to={`/login`}>Login</LinkContainer> : <LinkContainer to={`/`}><button onClick={() => { signOut(); }}>Sign Out</button></LinkContainer>}
+          {token == null || token == undefined ? <LinkContainer to={`/login`}>Login</LinkContainer> : <LinkContainer to={`/`}><SignOutButton /></LinkContainer>}
             </PagesContainer>
            : 
             <NavbarContainer>
