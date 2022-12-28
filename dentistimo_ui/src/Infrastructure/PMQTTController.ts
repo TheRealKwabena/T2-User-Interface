@@ -1,7 +1,7 @@
 import Paho from 'paho-mqtt';
 import { encrypt } from '../utils/encryptionUtils';
 // Create a client instance
-const client = new Paho.Client('80a9b426b200440c81e9c17c2ba85bc2.s2.eu.hivemq.cloud', Number(8884), "clientId");
+const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), "clientId");
 client.onMessageArrived = onMessageArrived;
 
 var login_response = '';
@@ -111,7 +111,7 @@ export function connectMQTT() {
     client.connect({
         useSSL: true,
         onSuccess: onConnect,
-        userName: 'gusreinaos',
-        password: 'Mosquitto1204!' 
+        userName: 'T2Project',
+        password: 'Mamamia1234.' 
     });
 }
