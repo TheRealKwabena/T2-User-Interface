@@ -43,20 +43,23 @@ export function onMessageArrived(message: any) {
         signout_response = message.payloadString;
     }
 }
-
+// method for getting jwt and id of a user
 export const getJWT = async () => {
     return new Promise(() => {
         client.subscribe('authentication/signIn/response', { qos: 1 });
         try {
             setTimeout(() => {
                 const object = JSON.parse(login_response)
-                window.localStorage.setItem('TOKEN', object.jwtToken);
-                window.localStorage.setItem('ID', object._id)
-                window.location.replace("/");
-
-                if (localStorage.getItem('TOKEN') === null) {
+                if (object.jwtToken === 'null') {
                     alert('could not log in');
-                }
+                    window.location.reload();
+                } else {
+                    
+                    window.localStorage.setItem('TOKEN', object.jwtToken);
+                    window.localStorage.setItem('ID', object._id);
+                    window.location.replace("/");
+                } 
+
             }, 1000)
 
         } catch (error) {
