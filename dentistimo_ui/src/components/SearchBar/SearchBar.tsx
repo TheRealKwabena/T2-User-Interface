@@ -10,13 +10,13 @@ const SearchBar = () => {
     const dentistriesList: string[] = dentistries.map((dentistry, index) => {return dentistry.name});
     
     return (
-        <Stack spacing= {2}>
+        <Stack id='search-bar' spacing= {2}>
             <Autocomplete
             disablePortal
             id="combo-box-demo"
-            sx={{ width: 300 , borderRadius: '15px' }}
+            sx={{ width: 600 , borderRadius: '10px'}}
             options={dentistriesList}
-            renderInput={(params) => <TextField {...params} label='Search by name or location ...'/>}
+            renderInput={(params) => <TextField {...params} label='Search by name or location'/>}
             value={value}
             onChange={(event: any, newValue: string | null) => setValue(newValue)}
             freeSolo

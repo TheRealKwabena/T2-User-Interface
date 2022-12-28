@@ -39,7 +39,7 @@ form .pass-txt{
     font-size: 13px;
   }
 
-form input[type="signup"]{
+button{
     height: 40px;
     width: 150px;
     margin-top: 30px;
@@ -51,6 +51,6 @@ form input[type="signup"]{
   
     transition: all 0.3s ease;
   }
-  form input[type="signup"]:hover{
+  button:hover{
     background: #2cedd3;
   }
