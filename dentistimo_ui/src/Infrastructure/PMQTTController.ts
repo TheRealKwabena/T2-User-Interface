@@ -1,5 +1,5 @@
 import Paho from 'paho-mqtt';
-import { encrypt } from '../utils/encryptionUtils';
+import { decrypt, encrypt } from '../utils/encryptionUtils';
 // Create a client instance
 const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), "clientId");
 client.onMessageArrived = onMessageArrived;
@@ -54,9 +54,9 @@ export const getJWT = async () => {
                     alert('could not log in');
                     window.location.reload();
                 } else {
-                    
+                    const encryptId = encrypt(object._id); // encrypting id in order to mae it harder to steal credentials
                     window.localStorage.setItem('TOKEN', object.jwtToken);
-                    window.localStorage.setItem('ID', object._id);
+                    window.localStorage.setItem('ID', encryptId);
                     window.location.replace("/");
                 } 
 
@@ -72,11 +72,13 @@ export const getJWT = async () => {
 
 export const signOut = async () => {
     try {
-        const userId = { id: localStorage.getItem('ID') }
+        const id = String(localStorage.getItem('ID'));
+        const decryptedId = decrypt(id);
+        const userId = { id: decryptedId }
         const encrypted = encrypt(userId);
         publish('authentication/signOut/request', encrypted.toString());
         
-            return new Promise(() => {
+            return await new Promise(() => {
                 client.subscribe('authentication/signOut/response', { qos: 1 });
                 try {
                     setTimeout(() => {
