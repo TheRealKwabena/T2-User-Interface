@@ -168,7 +168,7 @@ const Dentistries: React.FC = () => {
                                                 console.log('Done!');
                                             }
                                         }}
-                                        initialView='timeGridDay'
+                                        initialView='timeGridWeek'
                                         selectable={true}
                                         selectMirror={true}
                                         editable={true}
@@ -181,17 +181,14 @@ const Dentistries: React.FC = () => {
                                             setModalOpen(true)
                                             info.view.calendar.refetchEvents();
                                         }}
-                                        selectConstraint={{
-                                            end: '00:30:00'
-                                        }}
+                                        selectConstraint={'businessHours'}
                                         eventOverlap={false}
                                         allDaySlot={false}
-                                        slotMinTime={'08:00:00'}
-                                        slotMaxTime={'17:00:00'}
+                                        slotMinTime={'06:00:00'}
                                         weekends={false}
                                         defaultTimedEventDuration={'00:30'}
                                         selectAllow={(info) => {
-                                            if (info.end.getTime() - info.start.getTime() <= (30 * 60 * 1000)) {
+                                            if ((info.start > new Date()) && (info.end.getTime() - info.start.getTime() <= (30 * 60 * 1000))) {
                                                 return true
                                             } else {
                                                 return false
@@ -203,6 +200,15 @@ const Dentistries: React.FC = () => {
                                         selectOverlap={(event) => {
                                             return event.display === 'inverse-background';
                                         }}
+                                        businessHours={
+                                            Object.keys(dentistry.openinghours).map((day, index) => (
+                                            {
+                                                daysOfWeek: [index+1],
+                                                startTime: (dentistry.openinghours[day].split('-'))[0],
+                                                endTime: (dentistry.openinghours[day].split('-'))[1],
+                                                display: 'inverse-background'
+                                            }
+                                        ))}
                                     /> 
                                     </Typography>
                                     </AccordionDetails>

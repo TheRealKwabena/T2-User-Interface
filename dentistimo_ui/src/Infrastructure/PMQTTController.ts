@@ -44,7 +44,7 @@ interface apptToBeDeleted {
 export function deleteAppointment(slot: apptToBeDeleted) : Promise<any> {
     return new Promise((resolve, reject) => {
         client.subscribe('delete/appointment/response');
-        publish('delete/appointment/request', `{"userId": "${slot.userId}", "dentistId": "${slot.dentistId}", "date": "${slot.date.replace('T', ' ')}"}`);
+        publish('delete/appointment/request', JSON.stringify(slot));
         setTimeout(() => {
             if (deleteRes.response === 'yes') {
                 resolve(deleteRes);
