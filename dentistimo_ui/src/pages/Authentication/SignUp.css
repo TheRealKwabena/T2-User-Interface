@@ -54,3 +54,24 @@ button{
   button:hover{
     background: #2cedd3;
   }
+
+  #name{
+    margin-top: 40px;
+    height: 35px;
+    width: 70%; 
+    position: center;
+  }
+  
+  #email{
+    margin-top: 20px;
+    height: 35px;
+    width: 70%; 
+    position: center;
+  }
+
+  #password{
+    margin-top: 20px;
+    height: 35px;
+    width: 70%;
+    position: center;
+}
