@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useForm } from 'react-hook-form';
 import "./SignUp.css"
-import { publish, subscribe, connectMQTT } from '../../Infrastructure/PMQTTController';
+import { publish, connectMQTT } from '../../Infrastructure/PMQTTController';
 import { encrypt, decrypt } from "../../utils/encryptionUtils";
 import { User } from './UserType';
 import { EMAIL_REGEX, PASSWORD_REGEX } from "./Regex";
