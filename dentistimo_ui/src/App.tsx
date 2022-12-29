@@ -29,7 +29,7 @@ const App = () => {
           <Route path="/appointments" element={<Dentistries />}></Route>
           { (token == 'null' || token == undefined) ? 
           <>
-            <Route path="/login" element={<Login pageName='Login'/>}></Route>
+            <Route path="/" element={<Login pageName='Login'/>}></Route>
             <Route path="/signup" element={<SignUp/>}></Route>
           </> 
           : 

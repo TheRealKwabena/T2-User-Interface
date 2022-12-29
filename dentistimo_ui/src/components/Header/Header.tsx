@@ -16,28 +16,36 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
 
   return (
     <Nav>
-      <LogoContainer to='/'>
-            <Logo src={require("./logo/image.png")} />
-      </LogoContainer>
-        { !reduced ? 
+      {token == null || token == undefined ?
+          <LogoContainer to='/'>
+            <img style={{width: 100}} src={require("./logo/image.png")} />
+          </LogoContainer>
+        :
+        <>
+          {!reduced ? 
+            <>
+              <LogoContainer to='/'>
+              <Logo src={require("./logo/image.png")} />
+            </LogoContainer>
             <PagesContainer>
-              <Link to='appointments' smooth={true} offset={-110} duration={900}>
-                <LinkContainer to={`/`}>
-                <a>Appointments</a>
-                </LinkContainer>
-              </Link>
-              <Link to='dentistries' smooth={true} offset={-110} duration={900}>
-                <LinkContainer to={`/`}>
-                  <a>Dentistries</a>
-                </LinkContainer>
-              </Link>
-              <Link to='appointments2' smooth={true} offset={-110} duration={900}>
-                <LinkContainer to={'/myslots'}>
-                  MyBookings
-                </LinkContainer>
-              </Link>
-          {token == null || token == undefined ? <LinkContainer to={`/login`}>Login</LinkContainer> : <LinkContainer to={`/`}><SignOutButton /></LinkContainer>}
+            <Link to='appointments' smooth={true} offset={-110} duration={900}>
+              <LinkContainer to={`/`}>
+              <a>Appointments</a>
+              </LinkContainer>
+            </Link>
+            <Link to='dentistries' smooth={true} offset={-110} duration={900}>
+              <LinkContainer to={`/`}>
+                <a>Dentistries</a>
+              </LinkContainer>
+            </Link>
+            <Link to='appointments2' smooth={true} offset={-110} duration={900}>
+              <LinkContainer to={'/myslots'}>
+                MyBookings
+              </LinkContainer>
+            </Link>
+            <LinkContainer to={`/`}><SignOutButton /></LinkContainer>
             </PagesContainer>
+            </>
            : 
             <NavbarContainer>
               <div id='hamburger'>
@@ -75,7 +83,7 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                   <ListItemButton>
                     <ListItemIcon>
                       <ListItemText>
-                          About
+                          MyBookings
                       </ListItemText>
                     </ListItemIcon>
                   </ListItemButton>
@@ -83,6 +91,9 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                 </List>
               </Drawer>
             </NavbarContainer>}
+        </>
+        }
+        
       </Nav>    
   )
 }
