@@ -1,24 +1,45 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Header from "./components/Header/Header";
-import Login from "./pages/Authentication/Login";
-import Dentistries from "./pages/Dentistries/Dentistries";
 import Landing from './pages/Landing/Landing'
 import ScrollToTop from './ScrollToTop';
+import UpcomingAppointments from "./components/MyAppointments/UpcomingAppointments";
+import { useEffect } from "react";
+import { connectMQTT } from "./Infrastructure/PMQTTController";
+import Login from "./pages/Authentication/Login";
+import Dentistries from "./pages/Dentistries/Dentistries";
 import {SignUp} from "./pages/Authentication/SignUp"
 const token = localStorage.getItem('TOKEN');
 
 const App = () => {
+  
+  useEffect(() => {
+    try {
+      connectMQTT();
+    } catch (e) {
+      console.log('MQTT cannot connect. Please try again.');
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <Header/>
       <ScrollToTop/>
       <div style={{marginTop: '120px'}}>
         <Routes>
-          <Route path="/" element={<Landing pageName={'Home'}/>}></Route>
           <Route path="/appointments" element={<Dentistries />}></Route>
-          {token == 'null' || token == undefined ? <><Route path="/login" element={<Login pageName='Login'/>}></Route>
-          <Route path="/signup" element={<SignUp/>}></Route></> : <Route path="/signOut" />}
-          
+          { (token == 'null' || token == undefined) ? 
+          <>
+            <Route path="/login" element={<Login pageName='Login'/>}></Route>
+            <Route path="/signup" element={<SignUp/>}></Route>
+          </> 
+          : 
+          <>
+            <Route path="/appointments" element={<Landing pageName={'Home'}/>}></Route>
+            <Route path="/" element={<Landing pageName={'Home'}/>}></Route>
+            <Route path="/myslots" element={<UpcomingAppointments/>}></Route>
+            <Route path="/signOut"/>
+          </>
+          }
         </Routes>
       </div>
     </BrowserRouter>
