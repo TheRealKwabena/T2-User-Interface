@@ -1,11 +1,14 @@
 import Paho from 'paho-mqtt';
-
+import { decrypt, encrypt } from '../utils/encryptionUtils';
 // Create a client instance
 const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
 var appointments : any[];
 var deleteRes : any;
 var editRes : any;
+
+var login_response = '';
+var signout_response = '';
 
 interface ApptToBeDeleted {
     userId: string;
@@ -37,7 +40,7 @@ export function sub(topic: string, qos: any) {
 export function publish(topic: any, message: any) {
     const payload = new Paho.Message(message);
     payload.destinationName = topic;
-    client.send(payload);
+    client.send(topic, message, 1);
 }
 
 export function getAppointments(id: string) : Promise<any[]> {
@@ -98,8 +101,69 @@ export function onMessageArrived(message: any) {
         deleteRes = JSON.parse(message.payloadString);
     } if (message.destinationName === 'edit/response') {
         editRes = JSON.parse(message.payloadString);
+    } if (message.destinationName === 'authentication/signIn/response') {
+        login_response = message.payloadString;
+    } if (message.destinationName === 'authentication/signOut/response') {
+        signout_response = message.payloadString;
     }
 }
+
+// method for getting jwt and id of a user
+export const getJWT = async () => {
+    return new Promise(() => {
+        client.subscribe('authentication/signIn/response', { qos: 1 });
+        try {
+            setTimeout(() => {
+                const object = JSON.parse(login_response)
+                if (object.jwtToken === 'null') {
+                    alert('could not log in');
+                    window.location.reload();
+                } else {
+                    const encryptId = encrypt(object._id); // encrypting id in order to mae it harder to steal credentials
+                    window.localStorage.setItem('TOKEN', object.jwtToken);
+                    window.localStorage.setItem('ID', encryptId);
+                    window.location.replace("/");
+                } 
+
+            }, 1000)
+
+        } catch (error) {
+            alert('something went wrong, please try again.');
+        }
+      
+    })
+}
+
+
+export const signOut = async () => {
+    try {
+        const id = String(localStorage.getItem('ID'));
+        const decryptedId = decrypt(id);
+        const userId = { id: decryptedId }
+        const encrypted = encrypt(userId);
+        publish('authentication/signOut/request', encrypted.toString());
+        
+            return await new Promise(() => {
+                client.subscribe('authentication/signOut/response', { qos: 1 });
+                try {
+                    setTimeout(() => {
+                        const response = JSON.parse(signout_response);
+    
+                        if (response.jwtToken === 'null') {//if token is received as null then clear storage and logout
+                            localStorage.clear();
+                            window.location.reload();
+                        }
+                    }, 300)
+                    
+                } catch (error) {
+                    alert(error);
+                }
+            })
+    } catch (error) {
+        alert(error);
+    }
+}
+
 
 /**
  * Reference from PAHO DOCS -->

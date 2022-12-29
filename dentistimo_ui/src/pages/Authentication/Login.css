@@ -52,10 +52,6 @@
     transition: all 0.2s ease;
   }
   
-  
-  
-  
-  
   form input::placeholder{
     color: #bfbfbf;
     font-size: 15px;
@@ -90,3 +86,16 @@
    
   }
   
+  #loading-screen {
+    position:absolute;
+    top:70%;
+    right: 48%;
+  }
+
+  .form-value {
+    color: red;
+    margin-left: 5rem;
+    display: flex;
+    justify-content: flex-start;
+
+  }
