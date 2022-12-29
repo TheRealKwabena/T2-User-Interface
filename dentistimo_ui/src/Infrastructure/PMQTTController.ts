@@ -4,7 +4,23 @@ import Paho from 'paho-mqtt';
 const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
 var appointments : any[];
-var deleteRes : {response: string;};
+var deleteRes : any;
+var editRes : any;
+
+interface ApptToBeDeleted {
+    userId: string;
+    dentistId: string;
+    date: string;   
+}
+
+interface ModifiedAppt {
+    userId: string,
+    dentistId: string,
+    requestId: string,
+    issuance: string,
+    date: string,
+    editDate: string
+}
 
 // called when the client connects
 export function onConnect() {
@@ -35,13 +51,7 @@ export function getAppointments(id: string) : Promise<any[]> {
     })
 }
 
-interface apptToBeDeleted {
-    userId: string;
-    dentistId: string;
-    date: string;   
-}
-
-export function deleteAppointment(slot: apptToBeDeleted) : Promise<any> {
+export function deleteAppointment(slot: ApptToBeDeleted) : Promise<any> {
     return new Promise((resolve, reject) => {
         client.subscribe('delete/appointment/response');
         publish('delete/appointment/request', JSON.stringify(slot));
@@ -55,12 +65,19 @@ export function deleteAppointment(slot: apptToBeDeleted) : Promise<any> {
     })
 }
 
-/**
- * new Promise((resolve, reject) => {
- *  if (messageReceived(get/appointments/response)) {resolve()};
- *  
- * })
- */
+export function editAppointment(slot: ModifiedAppt) : Promise<any> {
+    return new Promise((resolve, reject) => {
+        client.subscribe('edit/response');
+        publish('edit/request', JSON.stringify(slot));
+        setTimeout(() => {
+            if (editRes.date !== 'none') {
+                resolve(editRes.status);
+            } else {
+                reject('The edit was unsuccessful.');
+            }
+        }, 300);
+    })
+}
 
 // called when the client loses its connection
 export function onConnectionLost(responseObject: any) {
@@ -79,11 +96,9 @@ export function onMessageArrived(message: any) {
         appointments = JSON.parse(message.payloadString);
     } if (message.destinationName === 'delete/appointment/response') {
         deleteRes = JSON.parse(message.payloadString);
+    } if (message.destinationName === 'edit/response') {
+        editRes = JSON.parse(message.payloadString);
     }
-}
-
-export function onMessageDelivered(message: any) {
-    console.log('Message sent to: ' + message.destinationName + ' , Message: ' + message.payloadString);
 }
 
 /**
@@ -98,7 +113,6 @@ export function onMessageDelivered(message: any) {
 export function connectMQTT() {
     client.onConnectionLost = onConnectionLost;
     client.onMessageArrived = onMessageArrived;
-    client.onMessageDelivered = onMessageDelivered;
     client.connect({
         useSSL: true,
         onSuccess: onConnect,

@@ -1,18 +1,23 @@
 import React, { useState,useEffect } from 'react';
 import './MyAppointments.css'
 import Table from 'react-bootstrap/Table';
-import {deleteAppointment, getAppointments} from '../../Infrastructure/PMQTTController';
+import {deleteAppointment, editAppointment, getAppointments} from '../../Infrastructure/PMQTTController';
 import {BsCalendar2Check,BsClock, BsFillGeoAltFill, BsFillTrashFill, BsPencilFill} from "react-icons/bs";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 
 function UpcomingAppointments() {
-  const [updateModalOpen, setUpdateModalOpen] = useState<boolean>(false);
-  const [changeConfirmed, setChangeConfirmed] = useState<boolean>(false);
+  const [updateModal, setUpdateModal] = useState<any>({
+    isOpen: false,
+    dentistId: '',
+    requestId: '',
+    issuance: '',
+    oldDate: '',
+    date: '',
+    time: ''
+  });
   const [data, setData] = useState<any[]>([]);
-  const [newDate, setNewDate] = useState<string>('');
-  const [newTime, setNewTime] = useState<string>('');
   const [filterUpcoming, setFilterUpcoming] = useState<boolean>(true);
   const [deleteModal, setDeleteModal] = useState<any>({
     isOpen: false,
@@ -20,30 +25,20 @@ function UpcomingAppointments() {
     date: '',
     time: ''
   });
-  const [deleteConfirmed, setDeleteConfirmed] = useState<boolean>(false);
   const id = '2';   //needs to be changed to a userId that is checked by AUTH controller
   
   useEffect(() => {
-    setTimeout(() => fetchApps(id), 200);
-  }, []);
+    setTimeout(() => fetchApps(id), 1000);
+  });
 
   //gets all appointments
   const fetchApps = async (dentistId: string) => {
     await getAppointments(dentistId)
         .then(response => {
           setData(response);
-          console.log('appointments fetched');
         }).catch ((e) => {
           console.log(e);
         });
-  }
-
-  const editAppointment = async (slot: {userId: string, dentistId: string, issuance: string, date: string}, newDate: string) => {
-    if (changeConfirmed) {
-      //publish to mqtt
-      //make an mqtt method in PMQTTController.js
-    }
-    setChangeConfirmed(false);
   }
 
   //gets current date and day
@@ -67,15 +62,23 @@ function UpcomingAppointments() {
 
     return (
       <>
-        <Modal show={updateModalOpen} onHide={() => setUpdateModalOpen(false)}>
-            <form onSubmit={(e) => {
+        <Modal show={updateModal.isOpen} onHide={() => setUpdateModal({...updateModal, isOpen: false})}>
+            <form onSubmit={async (e) => {
                         e.preventDefault()
-                        console.log(changeConfirmed)
-                        setChangeConfirmed(true)
-                        //editAppointment(appointmentInfo)
-                        setTimeout(() => {
-                            setUpdateModalOpen(false);
-                        }, 200);
+                        await editAppointment({
+                            userId: '1274187', 
+                            dentistId: updateModal.dentistId, 
+                            requestId: updateModal.requestId, 
+                            issuance: updateModal.issuance, 
+                            date: updateModal.oldDate, 
+                            editDate: `${updateModal.date} ${updateModal.time}`
+                        }).then((res) => {
+                          console.log('Edit successful.');
+                          setUpdateModal({...updateModal, isOpen: false, dentistId: '', requestId: '', issuance: '', oldDate: '', date: '', time: ''});
+                        }).catch((e) => {
+                          console.log(e);
+                          setUpdateModal({...updateModal, isOpen: false, dentistId: '', requestId: '', issuance: '', oldDate: '', date: '', time: ''});
+                        })
                     }}>
             <Modal.Header closeButton>
                 <Modal.Title>
@@ -83,12 +86,14 @@ function UpcomingAppointments() {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                New Date: <input type="date" id='new-date' required value={newDate} onChange={(e) => {
-                  setNewDate(e.target.value);
+                Current Appointment: &nbsp;
+                <strong>{updateModal.oldDate.substring(0, updateModal.oldDate.length - 3)}</strong><hr/>
+                New Date: <input type="date" id='new-date' required min={`${new Date().toISOString()}`} value={updateModal.date} onChange={(e) => {
+                  setUpdateModal({...updateModal, date: e.target.value});
                 }}/>
                 <br/><br/>
-                New Time: <input type="text" required pattern='^(2[0-3]|[01][0-9]):([03]?[0])$' id='new-time' value={newTime} onChange={(e) => {
-                  setNewTime(e.target.value);
+                New Time: <input type="text" required pattern='^(2[0-3]|[01][0-9]):([03]?[0])$' id='new-time' value={updateModal.time} onChange={(e) => {
+                  setUpdateModal({...updateModal, time: e.target.value});
                 }}/>
             </Modal.Body>
             <Modal.Footer>
@@ -106,12 +111,15 @@ function UpcomingAppointments() {
             <form onSubmit={async(e) => {
                         e.preventDefault()
                         await deleteAppointment({userId: '1274187', dentistId: deleteModal.id, date: `${deleteModal.date} ${deleteModal.time}`}).then(() => {
-                          setTimeout(() => {
-                            setDeleteModal({...deleteModal, isOpen: false, id: '', date: '', time: ''});
-                            setDeleteConfirmed(false);
-                            fetchApps(id);
-                          }, 100);
-                        }).catch(e => console.log(e));
+                           console.log('Deletion successful.')
+                        }).catch(e => {
+                          console.log(e)
+                          setDeleteModal({...deleteModal, isOpen: false, id: '', date: '', time: ''});
+                        });
+                        setTimeout(() => {
+                          setDeleteModal({...deleteModal, isOpen: false, id: '', date: '', time: ''});
+                          fetchApps(id);
+                        }, 100);
                     }}>
             <Modal.Header closeButton>
                 <Modal.Title>
@@ -142,7 +150,7 @@ function UpcomingAppointments() {
                   setDeleteModal({...deleteModal, isOpen: true, id: value.dentistId, date: dateonly, time: timeonly});
                 }}/></td> 
                 <td><BsPencilFill type="button" onClick={() => {
-                  setUpdateModalOpen(true);
+                  setUpdateModal({...updateModal, isOpen: true, dentistId: value.dentistId, requestId: value.requestId, issuance: value.issuance, oldDate: value.date.toString()});
                   fetchApps(id);
                 }}/></td>      
               </tr>) : (<></>)) 
@@ -150,12 +158,12 @@ function UpcomingAppointments() {
               (<tr key={value._id}>
                 <td>{dateonly}</td>
                 <td>{timeonly}</td>
-                <td><BsFillTrashFill type="button" onClick={async() => {
+                <td><BsFillTrashFill type="button" onClick={async () => {
                   setDeleteModal({...deleteModal, isOpen: true, id: value.dentistId, date: dateonly, time: timeonly});
                   fetchApps(id);
                 }}/></td> 
                 <td><BsPencilFill type="button" onClick={() => {
-                  setUpdateModalOpen(true);
+                  setUpdateModal({...updateModal, isOpen: true, dentistId: value.dentistId, requestId: value.requestId, issuance: value.issuance, oldDate: value.date.toString()});
                   fetchApps(id);
                 }}/></td>      
                 </tr>)
