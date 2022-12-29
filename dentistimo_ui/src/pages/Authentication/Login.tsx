@@ -3,7 +3,9 @@ import "./Login.css";
 import { connectMQTT, publish, getJWT } from '../../Infrastructure/PMQTTController';
 import { encrypt, decrypt } from "../../utils/encryptionUtils";
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen';
-
+import { User } from './UserType';
+import { useForm } from 'react-hook-form';
+import { EMAIL_REGEX, PASSWORD_REGEX } from './Regex';
 interface LoginPageProps {
   pageName: string;
   user?: {
@@ -13,16 +15,10 @@ interface LoginPageProps {
 }
 
 const Login = (props: LoginPageProps) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [onLoad, setOnLoad] = useState(false);
   const SIGN_IN_REQUEST_TOPIC = 'authentication/signIn/request';
-
-  const loggedIn = {
-    email: email,
-    password: password
-  }
-
+  const { register, handleSubmit, formState: { errors } } = useForm<User>();
+  
   useEffect(() => { document.title = `${props.pageName} ⋅ Dentistimo` });
   
   useEffect(() => {
@@ -33,9 +29,9 @@ const Login = (props: LoginPageProps) => {
     }
   })
 
-  const logIn = async () => {
+  const logIn = async (user: User) => {
     try {
-      const encrypted_user = encrypt(loggedIn);
+      const encrypted_user = encrypt(user);
       publish(SIGN_IN_REQUEST_TOPIC, encrypted_user.toString());
       localStorage.clear();
       getJWT();
@@ -50,21 +46,31 @@ const Login = (props: LoginPageProps) => {
     }
   }
 
-
   return (
-    <form className="login-form" onSubmit={function( event ) {
-      event.preventDefault();
-    }}>
+    <form className="login-form" onSubmit={handleSubmit(logIn)}>
         <div className="wrapper">
         <header>Log in</header>
-            <input className ="email" type="text" placeholder="Enter your email" value={email} onChange={(e) => {setEmail(e.target.value)}}></input>
-            <input className="password" type="password" placeholder="Enter your password" value={password} onChange={(e) => {setPassword(e.target.value)}}></input>
+        <div>
+        <input
+          className="email"
+          type="text"
+          placeholder="Enter your email"
+          {...register("email", { required: true, pattern: EMAIL_REGEX})} />
+          {errors.email && <div className='form-value'>Please enter a valid email</div>}
+        </div>
+
+        <input
+          className="password"
+          type="password"
+          placeholder="Enter your password"
+          {...register("password", { required: true, pattern: PASSWORD_REGEX })} />
+          {errors.email && <div className='form-value'>Please enter a valid password</div>}
             <div className="pass-txt">
             <a href="./SignUp">
               Don't have an account? Sign Up. 
               </a>
             </div>
-            <button value="Login" onClick={() => { logIn() }}> Log in</button>
+            <button value="Login" type="submit"> Log in</button>
               <div id='loading-screen' style={onLoad ? { display: 'contents'} : {display: 'none'}}>
                   <LoadingScreen />
               </div>
