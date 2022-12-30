@@ -9,6 +9,7 @@ var editRes : any;
 
 var login_response = '';
 var signout_response = '';
+var error_response = '';
 
 interface ApptToBeDeleted {
     userId: string;
@@ -91,21 +92,37 @@ export function onConnectionLost(responseObject: any) {
 
 // called when a message arrives
 export function onMessageArrived(message: any) {
-    if (message.destinationName === 'appointment/response') {
-        console.log("appointment/response " + message.payloadString);
-    } if (message.destinationName === 'appointment/request') {
-        console.log("appointment/request " + message.payloadString)
-    } if (message.destinationName === 'get/appointments/response') {
-        appointments = JSON.parse(message.payloadString);
-    } if (message.destinationName === 'delete/appointment/response') {
-        deleteRes = JSON.parse(message.payloadString);
-    } if (message.destinationName === 'edit/response') {
-        editRes = JSON.parse(message.payloadString);
-    } if (message.destinationName === 'authentication/signIn/response') {
-        login_response = message.payloadString;
-    } if (message.destinationName === 'authentication/signOut/response') {
-        signout_response = message.payloadString;
-    }
+
+    const message_topic = message.destinationName;
+
+    switch (message_topic) {
+        case 'appointment/response':
+            console.log("appointment/response " + message.payloadString);
+            break;
+        case 'appointment/request':
+            console.log("appointment/request " + message.payloadString);
+            break;
+        case 'get/appointments/response':
+            appointments = JSON.parse(message.payloadString);
+            break;
+        case 'delete/appointment/response':
+            deleteRes = JSON.parse(message.payloadString);
+            break;
+        case 'edit/response':
+            editRes = JSON.parse(message.payloadString);
+            break;
+        case 'authentication/signIn/response':
+            login_response = message.payloadString;
+            break;
+        case 'authentication/signOut/response':
+            signout_response = message.payloadString;
+            break;
+        case 'error/response':
+            error_response = message.payloadString;
+            break;
+        default:
+            return;
+    }   
 }
 
 // method for getting jwt and id of a user
@@ -123,6 +140,7 @@ export const getJWT = async () => {
                     window.localStorage.setItem('TOKEN', object.jwtToken);
                     window.localStorage.setItem('ID', encryptId);
                     window.location.replace("/");
+                    client.unsubscribe('authentication/signIn/response')
                 } 
 
             }, 1000)
@@ -137,14 +155,13 @@ export const getJWT = async () => {
 
 export const signOut = async () => {
     try {
-        const id = String(localStorage.getItem('ID'));
-        const decryptedId = decrypt(id);
-        const userId = { id: decryptedId }
-        const encrypted = encrypt(userId);
-        publish('authentication/signOut/request', encrypted.toString());
-        
             return await new Promise(() => {
+                const id = String(localStorage.getItem('ID'));
+                const decryptedId = decrypt(id);
+                const userId = { id: decryptedId }
+                const encrypted = encrypt(userId);
                 client.subscribe('authentication/signOut/response', { qos: 1 });
+                publish('authentication/signOut/request', encrypted.toString());
                 try {
                     setTimeout(() => {
                         const response = JSON.parse(signout_response);
@@ -159,6 +176,19 @@ export const signOut = async () => {
                     alert(error);
                 }
             })
+    } catch (error) {
+        alert(error);
+    }
+}
+
+export const getError = async () => {
+    try {
+        return await new Promise(() => {
+            client.subscribe('error/response');
+            const error_parsed = JSON.parse(error_response);
+            console.log(error_parsed);
+        })
+
     } catch (error) {
         alert(error);
     }
