@@ -141,17 +141,17 @@ export const getJWT = async () => {
                     if (object.data.jwtToken === 'null') {
                         alert('could not log in');
                         window.location.reload();
+                    } else {
+                        const encryptId = encrypt(object.data._id); // encrypting id in order to mae it harder to steal credentials
+                        window.localStorage.setItem('ID', encryptId);
+                        window.localStorage.setItem('TOKEN', object.data.jwtToken);
+                        window.location.replace("/");
+                        client.unsubscribe('authentication/signIn/response')
                     }
                      
                 } else if (object.isSuccess === false) {
                     const error_message = String(object.errors[0].detail); 
                     alert(error_message);
-                } else {
-                    const encryptId = encrypt(object.data._id); // encrypting id in order to mae it harder to steal credentials
-                    window.localStorage.setItem('TOKEN', object.data.jwtToken);
-                    window.localStorage.setItem('ID', encryptId);
-                    window.location.replace("/");
-                    client.unsubscribe('authentication/signIn/response')
                 } 
 
             }, 1000)
@@ -166,29 +166,32 @@ export const getJWT = async () => {
 
 export const signOut = async () => {
     try {
-        return await new Promise(() => {
-                const id = String(localStorage.getItem('ID'));
-                const decryptedId = decrypt(id);
+        return new Promise(() => {
+                const user_id = String(localStorage.getItem('ID'));
+                client.subscribe('authentication/signOut/response', { qos: 1 });
+                const decryptedId = decrypt(user_id);
                 const userId = { id: decryptedId }
                 const encrypted = encrypt(userId);
-                client.subscribe('authentication/signOut/response', { qos: 1 });
                 publish('authentication/signOut/request', encrypted.toString());
                 try {
                     setTimeout(() => {
-                        const response = JSON.parse(signout_response);
+                        const object = JSON.parse(signout_response);
     
-                        if (response.jwtToken === 'null') {//if token is received as null then clear storage and logout
+                        if (object.isSuccess === true) {
                             localStorage.clear();
                             window.location.reload();
+                        } else if (object.isSuccess === false) {
+                            const error_message = String(object.errors[0].detail);
+                            alert(error_message);
                         }
                     }, 300)
                     
                 } catch (error) {
-                    alert(error);
+                    console.log(error);
                 }
             })
     } catch (error) {
-        alert(error);
+        console.log(error);
     }
 }
 
