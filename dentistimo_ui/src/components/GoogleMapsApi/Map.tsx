@@ -1,10 +1,12 @@
-import React,{ useState } from "react";
+import React, { useState } from "react";
 import {
   GoogleMap,
   Marker,
   InfoWindow,
   useLoadScript
 } from "@react-google-maps/api";
+import './SearchBar.css';
+import { Stack, Autocomplete, TextField } from '@mui/material';
 import { container, locationOnLoad } from "./mapSettings";
 import { dentistries } from '../../data/dentistries';
 
@@ -14,10 +16,14 @@ export type DentistryType = {
     address: string
 }
 
-
-const Map: React.FC = () => {
+const Map = () => {
+    const [searchResult, setResult] = useState<string | null> (null) 
+    
+    const dentistriesList: string[] = dentistries.map((dentistry, index) => {return dentistry.name});
 
     const [clickedDentistry, setClickedDentistry] = React.useState<DentistryType>({} as DentistryType);
+
+    const selectedDentistry = dentistries.find(e => e.name === searchResult)
 
     const onClicked = (dentistry: DentistryType) => {
         setClickedDentistry(dentistry);
@@ -39,12 +45,44 @@ const Map: React.FC = () => {
 
     if (!isLoaded) return <div>Loading</div>;
     return (
+        <div>
+            <div className='search_bar_container'>
+                <Stack id='search-bar' spacing= {2}>
+                    <Autocomplete
+                    disablePortal
+                    id="combo-box"
+                    sx={{ width: 600 , borderRadius: '10px'}}
+                    options={dentistriesList}
+                    renderInput={(params) => <TextField {...params} label='Search by name or location'/>}
+                    value={searchResult}
+                    onChange={(event: any, newValue: string | null) => setResult(newValue)}
+                    freeSolo
+                    /> 
+                </Stack>
+            </div>
+
         <GoogleMap
             mapContainerStyle={container}
             center={locationOnLoad}
             onUnmount={onUnMount}
             zoom={11}
         >
+
+        {
+            selectedDentistry?.coordinate && 
+            (
+                <InfoWindow
+                position={selectedDentistry.coordinate}
+                onCloseClick={() => setClickedDentistry({} as DentistryType)}  
+                >
+                <>
+                <p>Name: {selectedDentistry.name}</p> 
+                <p>Address: {selectedDentistry.address}</p>            
+                </>         
+                </InfoWindow>
+            )
+        }   
+
         {
             dentistries.map(dentistry => {
               return (
@@ -71,6 +109,7 @@ const Map: React.FC = () => {
             )
         }
         </GoogleMap>
+        </div>
   );
 };
 

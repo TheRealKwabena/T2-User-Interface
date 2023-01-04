@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './Dentistries.css';
-import Map from '../../components/GoogleMapsApi/Map';
+import Map, { DentistryType } from '../../components/GoogleMapsApi/Map';
 import { dentistries } from '../../data/dentistries';
 import SearchBar from '../../components/SearchBar/SearchBar';
 import Accordion from '@mui/material/Accordion';
@@ -16,6 +16,7 @@ import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {getAppointments, deleteAppointment, publish} from '../../Infrastructure/PMQTTController';
+import { ClickAwayListenerProps } from '@mui/material';
 
 interface IFetchedSlot {
     id?: string | undefined;
@@ -93,10 +94,7 @@ const Dentistries: React.FC = () => {
                 <div className='title'>
                     Our Dentistries
                 </div>
-                    <div className='search_bar_container'>
-                        <SearchBar />
-                    </div>
-                    <Map />
+                    <Map/>
                     <div className='dentistry_container'>
                         <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
                             <form onSubmit={(e) => {
