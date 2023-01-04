@@ -1,5 +1,6 @@
 import Paho from 'paho-mqtt';
 import { decrypt, encrypt } from '../utils/encryptionUtils';
+import { User } from '../pages/Authentication/UserType';
 // Create a client instance
 const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
@@ -8,6 +9,7 @@ var deleteRes : any;
 var editRes : any;
 
 var login_response = '';
+var signup_response = '';
 var signout_response = '';
 var error_response = '';
 
@@ -120,6 +122,9 @@ export function onMessageArrived(message: any) {
         case 'error/response':
             error_response = message.payloadString;
             break;
+        case 'authentication/signUp/response':
+            signup_response = message.payloadString;
+            break;
         default:
             return;
     }   
@@ -132,12 +137,18 @@ export const getJWT = async () => {
         try {
             setTimeout(() => {
                 const object = JSON.parse(login_response)
-                if (object.jwtToken === 'null') {
-                    alert('could not log in');
-                    window.location.reload();
+                if (object.isSuccess === true) {
+                    if (object.data.jwtToken === 'null') {
+                        alert('could not log in');
+                        window.location.reload();
+                    }
+                     
+                } else if (object.isSuccess === false) {
+                    const error_message = String(object.errors[0].detail); 
+                    alert(error_message);
                 } else {
-                    const encryptId = encrypt(object._id); // encrypting id in order to mae it harder to steal credentials
-                    window.localStorage.setItem('TOKEN', object.jwtToken);
+                    const encryptId = encrypt(object.data._id); // encrypting id in order to mae it harder to steal credentials
+                    window.localStorage.setItem('TOKEN', object.data.jwtToken);
                     window.localStorage.setItem('ID', encryptId);
                     window.location.replace("/");
                     client.unsubscribe('authentication/signIn/response')
@@ -155,7 +166,7 @@ export const getJWT = async () => {
 
 export const signOut = async () => {
     try {
-            return await new Promise(() => {
+        return await new Promise(() => {
                 const id = String(localStorage.getItem('ID'));
                 const decryptedId = decrypt(id);
                 const userId = { id: decryptedId }
@@ -184,9 +195,9 @@ export const signOut = async () => {
 export const getError = async () => {
     try {
         return await new Promise(() => {
-            client.subscribe('error/response');
+            client.subscribe('error/response', {qos:1});
             const error_parsed = JSON.parse(error_response);
-            console.log(error_parsed);
+            console.log(error_response);
         })
 
     } catch (error) {
@@ -194,6 +205,31 @@ export const getError = async () => {
     }
 }
 
+export const createUser = async (user: User) => {
+    try {
+        return await new Promise(() => {
+            client.subscribe('authentication/signUp/response', { qos: 1 });
+            const encrypted_user = encrypt(user);
+            publish('authentication/signUp/request', encrypted_user.toString());
+            
+            setTimeout(() => {
+                const object = JSON.parse(signup_response);
+                const onSuccess = object.isSuccess;
+                if (onSuccess === false) {
+                    const error_message = String(object.errors[0].detail);
+                    alert(error_message);
+                } else if(onSuccess === true) {
+                    alert('User created sucessfully');
+                    window.location.assign('/');
+                }
+            }, 500)
+        })
+
+    } catch (error) {
+        alert(error);
+    }
+    }
+  
 
 /**
  * Reference from PAHO DOCS -->

@@ -7,11 +7,14 @@ import { useEffect } from "react";
 import { connectMQTT } from "./Infrastructure/PMQTTController";
 import Login from "./pages/Authentication/Login";
 import Dentistries from "./pages/Dentistries/Dentistries";
-import {SignUp} from "./pages/Authentication/SignUp"
+import { SignUp } from "./pages/Authentication/SignUp";
+import { useState } from 'react';
 const token = localStorage.getItem('TOKEN');
 
 const App = () => {
-  
+
+  const [getError, setGetError] = useState('')
+
   useEffect(() => {
     try {
       connectMQTT();

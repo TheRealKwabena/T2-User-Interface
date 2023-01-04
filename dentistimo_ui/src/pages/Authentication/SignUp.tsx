@@ -2,14 +2,11 @@
 import { useState, useEffect } from "react";
 import { useForm } from 'react-hook-form';
 import "./SignUp.css"
-import { publish, connectMQTT } from '../../Infrastructure/PMQTTController';
-import { encrypt, decrypt } from "../../utils/encryptionUtils";
+import { publish, connectMQTT, createUser } from '../../Infrastructure/PMQTTController';
 import { User } from './UserType';
 import { EMAIL_REGEX, PASSWORD_REGEX } from "./Regex";
 
 export function SignUp(){
-    const SIGN_UP_REQUEST_TOPIC = 'authentication/signUp/request';
-    const SIGN_UP_RESPONSE_TOPIC = 'authentication/signUp/response';
     const { register, handleSubmit, formState: { errors } } = useForm<User>();
   
     useEffect(() => {
@@ -19,17 +16,6 @@ export function SignUp(){
           console.log(e);
       }
   })
-
-  const createUser = async (user: User) => {
-    try {
-      const encrypted_user = encrypt(user);
-      publish(SIGN_UP_REQUEST_TOPIC, encrypted_user.toString());
-      alert('User created sucessfully');
-      window.location.assign('/');
-    } catch (error) {
-      console.log(error);
-    }
-    }
   
     return (
     <form className="SignUp-form" onSubmit={handleSubmit(createUser)}>
