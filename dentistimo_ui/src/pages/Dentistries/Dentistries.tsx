@@ -58,10 +58,11 @@ const Dentistries: React.FC = () => {
                     date: selectInfo.slot.startStr
                 };
                 publish('authentication/appointment/request', JSON.stringify(desiredEvent));
-                onSlotSelect.refetchEvents();
+                setTimeout(() => onSlotSelect.refetchEvents(), 400);
             } else {
                 console.log('Nothing selected.')
             }
+            onSlotSelect.refetchEvents();
         }
     }
 
@@ -87,16 +88,17 @@ const Dentistries: React.FC = () => {
             //console.log(list);
             return list;
     }
+
+    const currentDentistry = (id: string) => {
+        setId(id);
+    }
     
     return (
             <div className='card'>
                 <div className='title'>
                     Our Dentistries
                 </div>
-                    <div className='search_bar_container'>
-                        <SearchBar />
-                    </div>
-                    <Map />
+                    <Map currentView={currentDentistry}/>
                     <div className='dentistry_container'>
                         <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
                             <form onSubmit={(e) => {
@@ -137,9 +139,11 @@ const Dentistries: React.FC = () => {
                         </Modal>
                         {
                             dentistries.map((dentistry: any, index: number) => (
-                                <Accordion id='accordion' TransitionProps={{ 
+                                <Accordion id='accordion' key={dentistry.id} hidden={id !== dentistry.id} TransitionProps={{ 
                                     unmountOnExit: true, 
-                                }} onChange={() => setId(dentistry.id)}>
+                                }} onChange={() => {
+                                    setId(dentistry.id);
+                                }}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
@@ -147,7 +151,6 @@ const Dentistries: React.FC = () => {
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
                                     <p className='dentists'> Dentists: {dentistry.dentists}</p>
-                                    <p className="id">ID: {dentistry.id}</p>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
