@@ -15,7 +15,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {getAppointments, deleteAppointment, publish} from '../../Infrastructure/PMQTTController';
+import {getAppointments, deleteAppointment, publish, rawUserId} from '../../Infrastructure/PMQTTController';
 
 interface IFetchedSlot {
     id?: string | undefined;
@@ -51,13 +51,13 @@ const Dentistries: React.FC = () => {
             const onSlotSelect = selectInfo.slot.view.calendar
             if (bookingConfirmed) {
                 let desiredEvent = {
-                    userId: '1274187', //authentication should add it in 
+                    userId: rawUserId().toString(), //authentication should add it in 
                     requestId: '10',   //to be replaced by guid
                     dentistId: selectInfo.id,    //to be replaced by fetching dentistry info
                     issuance: Math.floor((Math.random() * 100) + 1).toString(),
                     date: selectInfo.slot.startStr
                 };
-                publish('appointment/request', JSON.stringify(desiredEvent));
+                publish('authentication/appointment/request', JSON.stringify(desiredEvent));
                 onSlotSelect.refetchEvents();
             } else {
                 console.log('Nothing selected.')
@@ -170,7 +170,7 @@ const Dentistries: React.FC = () => {
                                         }}
                                         initialView='timeGridWeek'
                                         selectable={true}
-                                        selectMirror={true}
+                                        selectMirror={false}
                                         editable={true}
                                         eventClick={async (eventInfo) => {
                                             //more info about event maybe...

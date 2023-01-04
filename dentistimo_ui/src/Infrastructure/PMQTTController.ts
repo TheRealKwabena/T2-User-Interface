@@ -36,6 +36,10 @@ export function onConnect() {
     client.subscribe("appointment/response");
 }
 
+export function rawUserId() : string {
+    return decrypt(String(localStorage.getItem('ID'))).toString();
+}
+
 export function sub(topic: string, qos: any) {
     client.subscribe(topic, {qos: qos});
 }
