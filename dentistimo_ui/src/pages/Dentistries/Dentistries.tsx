@@ -15,7 +15,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {getAppointments, deleteAppointment, publish} from '../../Infrastructure/PMQTTController';
+import {getAppointments, deleteAppointment, publish, rawUserId} from '../../Infrastructure/PMQTTController';
 
 interface IFetchedSlot {
     id?: string | undefined;
@@ -51,17 +51,18 @@ const Dentistries: React.FC = () => {
             const onSlotSelect = selectInfo.slot.view.calendar
             if (bookingConfirmed) {
                 let desiredEvent = {
-                    userId: '1274187', //authentication should add it in 
+                    userId: rawUserId().toString(), //authentication should add it in 
                     requestId: '10',   //to be replaced by guid
                     dentistId: selectInfo.id,    //to be replaced by fetching dentistry info
                     issuance: Math.floor((Math.random() * 100) + 1).toString(),
                     date: selectInfo.slot.startStr
                 };
-                publish('appointment/request', JSON.stringify(desiredEvent));
-                onSlotSelect.refetchEvents();
+                publish('authentication/appointment/request', JSON.stringify(desiredEvent));
+                setTimeout(() => onSlotSelect.refetchEvents(), 500);
             } else {
                 console.log('Nothing selected.')
             }
+            setTimeout(() => onSlotSelect.refetchEvents(), 500);
         }
     }
 
@@ -78,7 +79,7 @@ const Dentistries: React.FC = () => {
                         end: endDate.toISOString(),
                         display: /*value.userId === userId ? block :*/ 'background', // userId is a to-be useState var obtained once auth module works
                         color: 'grey'
-                    }
+                     }
                 });
                 console.log(list);
             }).catch((e) => {
@@ -87,16 +88,17 @@ const Dentistries: React.FC = () => {
             //console.log(list);
             return list;
     }
+
+    const currentDentistry = (id: string) => {
+        setId(id);
+    }
     
     return (
             <div className='card'>
                 <div className='title'>
                     Our Dentistries
                 </div>
-                    <div className='search_bar_container'>
-                        <SearchBar />
-                    </div>
-                    <Map />
+                    <Map currentView={currentDentistry}/>
                     <div className='dentistry_container'>
                         <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
                             <form onSubmit={(e) => {
@@ -107,7 +109,7 @@ const Dentistries: React.FC = () => {
                                         setEventTitle('')
                                         setTimeout(() => {
                                             setModalOpen(false);
-                                        }, 200);
+                                        }, 300);
                                     }}>
                             <Modal.Header closeButton>
                                 <Modal.Title>
@@ -117,7 +119,7 @@ const Dentistries: React.FC = () => {
                             <Modal.Body>
                                 {/*Please mention the times. 
                                 (Need to add input boxes, one is disabled, that is 30mins + start).*/}
-                                Name: <input type="text" name="Name" id="" required placeholder='Name' value={eventTitle} onChange={(e) => {
+                                Name: <input type="text" name="Name" id="" disabled required placeholder='Name' value={eventTitle} onChange={(e) => {
                                     setEventTitle(e.target.value)
                                 }}/>
                                 <br></br><br></br>
@@ -137,9 +139,11 @@ const Dentistries: React.FC = () => {
                         </Modal>
                         {
                             dentistries.map((dentistry: any, index: number) => (
-                                <Accordion id='accordion' TransitionProps={{ 
+                                <Accordion id='accordion' key={dentistry.id} hidden={id !== dentistry.id} TransitionProps={{ 
                                     unmountOnExit: true, 
-                                }} onChange={() => setId(dentistry.id)}>
+                                }} onChange={() => {
+                                    setId(dentistry.id);
+                                }}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
@@ -147,13 +151,13 @@ const Dentistries: React.FC = () => {
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
                                     <p className='dentists'> Dentists: {dentistry.dentists}</p>
-                                    <p className="id">ID: {dentistry.id}</p>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
                                             
                                     <FullCalendar
                                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                                        rerenderDelay={900}
                                         headerToolbar={{
                                             left: 'prev,next today',
                                             center: 'title',
@@ -170,9 +174,10 @@ const Dentistries: React.FC = () => {
                                         }}
                                         initialView='timeGridWeek'
                                         selectable={true}
-                                        selectMirror={true}
+                                        selectMirror={false}
                                         editable={true}
                                         eventClick={async (eventInfo) => {
+                                            eventInfo.view.calendar.unselect();
                                             //more info about event maybe...
                                         }}
                                         dayMaxEvents={true}
