@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, redirect } from "react-router-dom";
 import Header from "./components/Header/Header";
 import Landing from './pages/Landing/Landing'
 import ScrollToTop from './ScrollToTop';
@@ -9,6 +9,8 @@ import Login from "./pages/Authentication/Login";
 import Dentistries from "./pages/Dentistries/Dentistries";
 import { SignUp } from "./pages/Authentication/SignUp";
 import { useState } from 'react';
+import ErrorBoundary from "./pages/ErrorPages/ErrorBoundary";
+
 const token = localStorage.getItem('TOKEN');
 
 const App = () => {
@@ -27,7 +29,8 @@ const App = () => {
     <BrowserRouter>
       <Header/>
       <ScrollToTop/>
-      <div style={{marginTop: '120px'}}>
+      <div style={{ marginTop: '120px' }}>
+      <ErrorBoundary>
         <Routes>
           <Route path="/appointments" element={<Dentistries />}></Route>
           { (token == 'null' || token == undefined) ? 
@@ -40,10 +43,11 @@ const App = () => {
             <Route path="/appointments" element={<Landing pageName={'Home'}/>}></Route>
             <Route path="/" element={<Landing pageName={'Home'}/>}></Route>
             <Route path="/myslots" element={<UpcomingAppointments/>}></Route>
-            <Route path="/signOut"/>
-          </>
+            <Route path="/signOut" />
+          </> 
           }
-        </Routes>
+          </Routes>
+          </ErrorBoundary>
       </div>
     </BrowserRouter>
   );

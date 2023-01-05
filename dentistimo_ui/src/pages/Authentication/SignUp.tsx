@@ -5,6 +5,7 @@ import "./SignUp.css"
 import { publish, connectMQTT, createUser } from '../../Infrastructure/PMQTTController';
 import { User } from './UserType';
 import { EMAIL_REGEX, PASSWORD_REGEX } from "./Regex";
+import { ToastContainer } from "react-toastify";
 
 export function SignUp(){
     const { register, handleSubmit, formState: { errors } } = useForm<User>();
@@ -18,7 +19,12 @@ export function SignUp(){
   })
   
     return (
-    <form className="SignUp-form" onSubmit={handleSubmit(createUser)}>
+      <form className="SignUp-form" onSubmit={handleSubmit(createUser)}>
+        <ToastContainer
+          position="bottom-center"
+          draggable
+          theme="colored"
+          hideProgressBar />
       <div className="wrapper">
         <header id ="header">Sign up</header>
      

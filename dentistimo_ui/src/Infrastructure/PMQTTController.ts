@@ -1,6 +1,7 @@
 import Paho from 'paho-mqtt';
 import { decrypt, encrypt } from '../utils/encryptionUtils';
 import { User } from '../pages/Authentication/UserType';
+import { toast } from 'react-toastify';
 // Create a client instance
 const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
@@ -8,10 +9,10 @@ var appointments : any[];
 var deleteRes : any;
 var editRes : any;
 
-var login_response = '';
-var signup_response = '';
-var signout_response = '';
-var error_response = '';
+var login_response: string = '';
+var signup_response: string = '';
+var signout_response: string = '';
+var error_response: string = '';
 
 interface ApptToBeDeleted {
     userId: string;
@@ -146,6 +147,7 @@ export const getJWT = async () => {
                         alert('could not log in');
                         window.location.reload();
                     } else {
+                        toast.success("Log in successful!");
                         const encryptId = encrypt(object.data._id); // encrypting id in order to mae it harder to steal credentials
                         window.localStorage.setItem('ID', encryptId);
                         window.localStorage.setItem('TOKEN', object.data.jwtToken);
@@ -155,13 +157,13 @@ export const getJWT = async () => {
                      
                 } else if (object.isSuccess === false) {
                     const error_message = String(object.errors[0].detail); 
-                    alert(error_message);
+                    toast.error(error_message);
                 } 
 
-            }, 1000)
+            }, 500)
 
         } catch (error) {
-            alert('something went wrong, please try again.');
+            toast.error('something went wrong, please try again!');
         }
       
     })
@@ -182,11 +184,12 @@ export const signOut = async () => {
                         const object = JSON.parse(signout_response);
     
                         if (object.isSuccess === true) {
+                            toast.success("You have been logged out!");
                             localStorage.clear();
                             window.location.reload();
                         } else if (object.isSuccess === false) {
                             const error_message = String(object.errors[0].detail);
-                            alert(error_message);
+                            toast.error(error_message);
                         }
                     }, 300)
                     
@@ -211,16 +214,16 @@ export const createUser = async (user: User) => {
                 const onSuccess = object.isSuccess;
                 if (onSuccess === false) {
                     const error_message = String(object.errors[0].detail);
-                    alert(error_message);
+                    toast.error(error_message);
                 } else if(onSuccess === true) {
-                    alert('User created sucessfully');
+                    toast.success('User created sucessfully');
                     window.location.assign('/');
                 }
             }, 500)
         })
 
     } catch (error) {
-        alert(error);
+        toast.error("Something went wrong, please try again!");
     }
     }
   

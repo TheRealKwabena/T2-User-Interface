@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import "./Login.css";
 import { connectMQTT, publish, getJWT } from '../../Infrastructure/PMQTTController';
 import { encrypt, decrypt } from "../../utils/encryptionUtils";
-import LoadingScreen from '../../components/LoadingScreen/LoadingScreen';
 import { User } from './UserType';
 import { useForm } from 'react-hook-form';
 import { EMAIL_REGEX, PASSWORD_REGEX } from './Regex';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 interface LoginPageProps {
   pageName: string;
   user?: {
@@ -35,11 +36,6 @@ const Login = (props: LoginPageProps) => {
       publish(SIGN_IN_REQUEST_TOPIC, encrypted_user.toString());
       localStorage.clear();
       getJWT();
-      if (localStorage.getItem('TOKEN') == null || localStorage.getItem('TOKEN') == undefined) {
-        setOnLoad(true);
-      } else {
-        setOnLoad(false);
-      }
 
     } catch (error) {
       console.log(error);
@@ -69,11 +65,15 @@ const Login = (props: LoginPageProps) => {
             <a href="./SignUp">
               Don't have an account? Sign Up. 
               </a>
-            </div>
+        </div>
+        <ToastContainer
+          position='bottom-center'
+          autoClose={3000}
+          draggable
+          theme='colored'
+          hideProgressBar
+        />
             <button value="Login" type="submit"> Log in</button>
-              <div id='loading-screen' style={onLoad ? { display: 'contents'} : {display: 'none'}}>
-                  <LoadingScreen />
-              </div>
           </div>
       </form>
     ) 

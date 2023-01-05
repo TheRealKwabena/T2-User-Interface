@@ -6,6 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, useMediaQuery} from '@mui/material';
 import '../styles.css';
 import SignOutButton from '../SignOutButton/SignOutButton';
+import { ToastContainer } from 'react-toastify';
 
 export interface IHeaderProps {}
 
@@ -43,7 +44,7 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                 MyBookings
               </LinkContainer>
             </Link>
-            <LinkContainer to={`/`}><SignOutButton /></LinkContainer>
+            <LinkContainer to={`/`}><ToastContainer position='bottom-center' draggable theme='colored' hideProgressBar/><SignOutButton /></LinkContainer>
             </PagesContainer>
             </>
            : 
