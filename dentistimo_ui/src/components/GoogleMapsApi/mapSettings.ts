@@ -1,7 +1,7 @@
 
 
 export const container = {
-    width: '94%',
+    width: '80vw',
     height: '50vh',
     borderRadius: '10px'
   };
