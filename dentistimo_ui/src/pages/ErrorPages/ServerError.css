@@ -10,4 +10,9 @@
     color:rgb(91, 91, 91);
     font-size: 35pt;
     font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-left: 5rem;
+}
+#sad-tooth {
+    width: 18rem;
+    margin-right: 3rem;
 }

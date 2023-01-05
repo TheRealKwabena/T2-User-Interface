@@ -141,7 +141,9 @@ export const getJWT = async () => {
         client.subscribe('authentication/signIn/response', { qos: 1 });
         try {
             setTimeout(() => {
-                const object = JSON.parse(login_response)
+                try {
+
+                    const object = JSON.parse(login_response)
                 if (object.isSuccess === true) {
                     if (object.data.jwtToken === 'null') {
                         alert('could not log in');
@@ -159,11 +161,14 @@ export const getJWT = async () => {
                     const error_message = String(object.errors[0].detail); 
                     toast.error(error_message);
                 } 
-
+                } catch (error) {
+                    toast.error("There are difficulties on our side, please try again later!")
+                }
+                
             }, 500)
 
         } catch (error) {
-            toast.error('something went wrong, please try again!');
+            toast.error('something went wrong, please try again later!');
         }
       
     })
@@ -210,15 +215,21 @@ export const createUser = async (user: User) => {
             publish('authentication/signUp/request', encrypted_user.toString());
             
             setTimeout(() => {
-                const object = JSON.parse(signup_response);
-                const onSuccess = object.isSuccess;
-                if (onSuccess === false) {
-                    const error_message = String(object.errors[0].detail);
-                    toast.error(error_message);
-                } else if(onSuccess === true) {
-                    toast.success('User created sucessfully');
-                    window.location.assign('/');
+                try {
+                    const object = JSON.parse(signup_response);
+                    const onSuccess = object.isSuccess;
+                    
+                    if (onSuccess === false) {
+                        const error_message = String(object.errors[0].detail);
+                        toast.error(error_message);
+                    } else if(onSuccess === true) {
+                        toast.success('User created sucessfully');
+                        window.location.assign('/');
+                    } 
+                } catch (error) {
+                    toast.error("There are difficulties on our side, please try again later!");
                 }
+
             }, 500)
         })
 
