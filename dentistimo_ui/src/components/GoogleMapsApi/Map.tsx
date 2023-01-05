@@ -52,7 +52,7 @@ const Map = (props: IMapViewProps) => {
     return (
         <div>
             <div className='search_bar_container'>
-                <Stack id='search-bar' spacing= {2}>
+                <Stack id='search-bar' spacing={2}>
                     <Autocomplete
                     disablePortal
                     id="combo-box"
@@ -86,8 +86,14 @@ const Map = (props: IMapViewProps) => {
                 <>
                 <div style={{fontFamily: 'Times New Roman', textAlign: 'center'}}>
                     <p>Name: {selectedDentistry.name}</p> 
-                    <p>Address: {selectedDentistry.address}</p>   
-                    <p>Open: {Object.values(selectedDentistry!.openinghours).at((new Date()).getDay()-1)}</p>
+                    <p>Address: {selectedDentistry.address}</p>
+                    <hr/>   
+                    <p>Opening hours today: <br/><br/>{
+                    (new Date()).getDay()-1 > Object.values(selectedDentistry!.openinghours).length || ((new Date()).getDay()-1 < Object.values(selectedDentistry!.openinghours).length)? 
+                        `${Object.keys(selectedDentistry!.openinghours).at((new Date()).getDay()-1)} : ${Object.values(selectedDentistry!.openinghours).at((new Date()).getDay()-1)}` 
+                    : 
+                        'Closed'}</p>
+                    <button style={{marginTop: '0px', padding: '6%'}}onClick={() => props.currentView(dentistries.find(dentist => selectedDentistry.name === dentist.name)!.id)}>Book</button>
                 </div>      
                 </>         
                 </InfoWindow>

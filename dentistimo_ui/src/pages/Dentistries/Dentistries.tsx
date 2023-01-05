@@ -58,11 +58,11 @@ const Dentistries: React.FC = () => {
                     date: selectInfo.slot.startStr
                 };
                 publish('authentication/appointment/request', JSON.stringify(desiredEvent));
-                setTimeout(() => onSlotSelect.refetchEvents(), 400);
+                setTimeout(() => onSlotSelect.refetchEvents(), 500);
             } else {
                 console.log('Nothing selected.')
             }
-            onSlotSelect.refetchEvents();
+            setTimeout(() => onSlotSelect.refetchEvents(), 500);
         }
     }
 
@@ -79,7 +79,7 @@ const Dentistries: React.FC = () => {
                         end: endDate.toISOString(),
                         display: /*value.userId === userId ? block :*/ 'background', // userId is a to-be useState var obtained once auth module works
                         color: 'grey'
-                    }
+                     }
                 });
                 console.log(list);
             }).catch((e) => {
@@ -109,7 +109,7 @@ const Dentistries: React.FC = () => {
                                         setEventTitle('')
                                         setTimeout(() => {
                                             setModalOpen(false);
-                                        }, 200);
+                                        }, 300);
                                     }}>
                             <Modal.Header closeButton>
                                 <Modal.Title>
@@ -119,7 +119,7 @@ const Dentistries: React.FC = () => {
                             <Modal.Body>
                                 {/*Please mention the times. 
                                 (Need to add input boxes, one is disabled, that is 30mins + start).*/}
-                                Name: <input type="text" name="Name" id="" required placeholder='Name' value={eventTitle} onChange={(e) => {
+                                Name: <input type="text" name="Name" id="" disabled required placeholder='Name' value={eventTitle} onChange={(e) => {
                                     setEventTitle(e.target.value)
                                 }}/>
                                 <br></br><br></br>
@@ -157,6 +157,7 @@ const Dentistries: React.FC = () => {
                                             
                                     <FullCalendar
                                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                                        rerenderDelay={900}
                                         headerToolbar={{
                                             left: 'prev,next today',
                                             center: 'title',
@@ -176,6 +177,7 @@ const Dentistries: React.FC = () => {
                                         selectMirror={false}
                                         editable={true}
                                         eventClick={async (eventInfo) => {
+                                            eventInfo.view.calendar.unselect();
                                             //more info about event maybe...
                                         }}
                                         dayMaxEvents={true}
