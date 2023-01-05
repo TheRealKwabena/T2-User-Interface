@@ -195,19 +195,6 @@ export const signOut = async () => {
     }
 }
 
-export const getError = async () => {
-    try {
-        return await new Promise(() => {
-            client.subscribe('error/response', {qos:1});
-            const error_parsed = JSON.parse(error_response);
-            console.log(error_response);
-        })
-
-    } catch (error) {
-        alert(error);
-    }
-}
-
 export const createUser = async (user: User) => {
     try {
         return await new Promise(() => {

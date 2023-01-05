@@ -63,7 +63,7 @@ const Login = (props: LoginPageProps) => {
           className="password"
           type="password"
           placeholder="Enter your password"
-          {...register("password", { required: true, pattern: PASSWORD_REGEX })} />
+          {...register("password")} />
           {errors.email && <div className='form-value'>Please enter a valid password</div>}
             <div className="pass-txt">
             <a href="./SignUp">
