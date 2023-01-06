@@ -90,10 +90,10 @@ const Map = (props: IMapViewProps) => {
                     <hr/>   
                     <p>Opening hours today: <br/><br/>{
                     (new Date()).getDay()-1 > Object.values(selectedDentistry!.openinghours).length || ((new Date()).getDay()-1 < Object.values(selectedDentistry!.openinghours).length)? 
-                        `${Object.keys(selectedDentistry!.openinghours).at((new Date()).getDay()-1)} : ${Object.values(selectedDentistry!.openinghours).at((new Date()).getDay()-1)}` 
+                        `${Object.keys(selectedDentistry!.openinghours).at((new Date()).getDay()-1)?.charAt(0).toUpperCase()}${Object.keys(selectedDentistry!.openinghours).at((new Date()).getDay()-1)?.slice(1)}: ${Object.values(selectedDentistry!.openinghours).at((new Date()).getDay()-1)}` 
                     : 
                         'Closed'}</p>
-                    <button style={{marginTop: '0px', padding: '6%'}}onClick={() => props.currentView(dentistries.find(dentist => selectedDentistry.name === dentist.name)!.id)}>Book</button>
+                    <button style={{marginTop: '0px', paddingBottom: '0px', fontSize: '18px', textAlign: 'center'}}onClick={() => props.currentView(dentistries.find(dentist => selectedDentistry.name === dentist.name)!.id)}>Book</button>
                 </div>      
                 </>         
                 </InfoWindow>

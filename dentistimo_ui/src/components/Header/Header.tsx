@@ -34,11 +34,6 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
               <a>Appointments</a>
               </LinkContainer>
             </Link>
-            <Link to='dentistries' smooth={true} offset={-110} duration={900}>
-              <LinkContainer to={`/`}>
-                <a>Dentistries</a>
-              </LinkContainer>
-            </Link>
             <Link to='appointments2' smooth={true} offset={-110} duration={900}>
               <LinkContainer to={'/myslots'}>
                 MyBookings
@@ -70,15 +65,6 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                       </ListItemText>
                     </ListItemIcon>
                     </ListItemButton>
-                  </Link>
-                  <Link to='dentistries' smooth={true} offset={-110} duration={900}>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <ListItemText>
-                          Dentistries
-                      </ListItemText>
-                    </ListItemIcon>
-                  </ListItemButton>
                   </Link>
                   <Link to='appointments2' smooth={true} offset={-110} duration={900}>
                   <ListItemButton>

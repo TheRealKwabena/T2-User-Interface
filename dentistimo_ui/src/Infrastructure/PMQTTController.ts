@@ -62,6 +62,17 @@ export function getAppointments(id: string) : Promise<any[]> {
     })
 }
 
+export function getUserAppointments(userId: string) : Promise<any[]> {
+    return new Promise((resolve, reject) => {
+        client.subscribe("user/appointments/response", {qos: 1});
+        publish('user/appointments/request', `{"userId": "${userId}"}`);
+        setTimeout(() => {
+            console.log(appointments);
+            resolve(appointments);
+        }, 400);
+    })
+}
+
 export function deleteAppointment(slot: ApptToBeDeleted) : Promise<any> {
     return new Promise((resolve, reject) => {
         client.subscribe('delete/appointment/response');
@@ -114,6 +125,9 @@ export function onMessageArrived(message: any) {
             break;
         case 'delete/appointment/response':
             deleteRes = JSON.parse(message.payloadString);
+            break;
+        case 'user/appointments/response':
+            appointments = JSON.parse(message.payloadString);
             break;
         case 'edit/response':
             editRes = JSON.parse(message.payloadString);
@@ -187,7 +201,6 @@ export const signOut = async () => {
                 try {
                     setTimeout(() => {
                         const object = JSON.parse(signout_response);
-    
                         if (object.isSuccess === true) {
                             toast.success("You have been logged out!");
                             localStorage.clear();
@@ -196,8 +209,7 @@ export const signOut = async () => {
                             const error_message = String(object.errors[0].detail);
                             toast.error(error_message);
                         }
-                    }, 300)
-                    
+                    }, 400)
                 } catch (error) {
                     console.log(error);
                 }

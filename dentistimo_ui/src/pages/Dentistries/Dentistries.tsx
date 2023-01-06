@@ -14,6 +14,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {getAppointments, deleteAppointment, publish, rawUserId} from '../../Infrastructure/PMQTTController';
 
@@ -74,12 +75,12 @@ const Dentistries: React.FC = () => {
                     const startDate = new Date(value.date.toString());
                     const endDate = new Date(startDate.getTime() + 30*60000);
                     return {
-                        title: 'Appointment',
+                        title: value.userId === rawUserId() ? 'Your Appointment' : 'Appointment',
                         start: startDate.toISOString(),
                         end: endDate.toISOString(),
-                        display: /*value.userId === userId ? block :*/ 'background', // userId is a to-be useState var obtained once auth module works
-                        color: 'grey'
-                     }
+                        display: 'background',
+                        color: value.userId === rawUserId() ? 'rgba(0,0,220,0.5)' : 'grey',
+                    }
                 });
                 console.log(list);
             }).catch((e) => {
@@ -119,12 +120,16 @@ const Dentistries: React.FC = () => {
                             <Modal.Body>
                                 {/*Please mention the times. 
                                 (Need to add input boxes, one is disabled, that is 30mins + start).*/}
-                                Name: <input type="text" name="Name" id="" disabled required placeholder='Name' value={eventTitle} onChange={(e) => {
-                                    setEventTitle(e.target.value)
-                                }}/>
-                                <br></br><br></br>
-                                Start Time: <input type="time" name="StartTime" id='start-time' /*onChange={}*//>
-                                End Time: <input type="time" name="EndTime" id='end-time' /*onChange={}*//>
+                                Start Time: <strong>{appointmentInfo.slot?.startStr.substring(0, 16).replace('T', ' ')}</strong>
+                                <br></br>
+                                End Time: <strong>{appointmentInfo.slot?.endStr.substring(0, 16).replace('T', ' ')}</strong>
+                                <br></br><br/>
+                                <Form.Check
+                                    required 
+                                    type={'checkbox'}
+                                    id={`default-check`}
+                                    label={'I agree to book the above date and time selected.'}
+                                />
                             </Modal.Body>
                             <Modal.Footer>
                                 <div id="button" style={{
@@ -132,7 +137,7 @@ const Dentistries: React.FC = () => {
                                     display: 'flex',
                                     justifyContent: 'center'
                                 }}>
-                                    <Button type='submit' variant='success' size='sm'>Confirm Appointment</Button>
+                                    <Button type='submit' variant='success' size='sm' style={{textAlign: 'center', height: 'auto', marginTop: '0px'}}>Confirm Appointment</Button>
                                 </div>
                             </Modal.Footer>
                             </form>
