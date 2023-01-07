@@ -64,7 +64,7 @@ function UpcomingAppointments() {
         <Modal show={deleteModal.isOpen} backdrop={true} onHide={() => setDeleteModal({...deleteModal, isOpen: false})}>
             <form onSubmit={async(e) => {
                         e.preventDefault()
-                        await deleteAppointment({userId: '1274187', dentistId: deleteModal.id, date: `${deleteModal.date} ${deleteModal.time}`}).then(() => {
+                        await deleteAppointment({userId: rawUserId(), dentistId: deleteModal.id, date: `${deleteModal.date} ${deleteModal.time}`}).then(() => {
                            console.log('Deletion successful.')
                         }).catch(e => {
                           console.log(e)
@@ -81,8 +81,9 @@ function UpcomingAppointments() {
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                You are about to delete your made appointment for: <br/><br/>
-                <strong>Date:</strong> {deleteModal.date} &nbsp; <strong>Time:</strong> {deleteModal.time}
+                You are about to delete your made appointment at: <br/><br/>
+                <strong>Dentistry: &nbsp;</strong> {dentistries.find(dentist => {return dentist.id === deleteModal.id.toString()})?.name}<br/>
+                <strong>Date: &nbsp;</strong> {deleteModal.date} <br/> <strong>Time: &nbsp;</strong> {deleteModal.time}
             </Modal.Body>
             <Modal.Footer>
                 <div id="button" style={{
