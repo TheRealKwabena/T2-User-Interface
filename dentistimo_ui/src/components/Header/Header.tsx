@@ -6,6 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import {Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, useMediaQuery} from '@mui/material';
 import '../styles.css';
 import SignOutButton from '../SignOutButton/SignOutButton';
+import { ToastContainer } from 'react-toastify';
 
 export interface IHeaderProps {}
 
@@ -33,17 +34,12 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
               <a>Appointments</a>
               </LinkContainer>
             </Link>
-            <Link to='dentistries' smooth={true} offset={-110} duration={900}>
-              <LinkContainer to={`/`}>
-                <a>Dentistries</a>
-              </LinkContainer>
-            </Link>
             <Link to='appointments2' smooth={true} offset={-110} duration={900}>
               <LinkContainer to={'/myslots'}>
                 MyBookings
               </LinkContainer>
             </Link>
-            <LinkContainer to={`/`}><SignOutButton /></LinkContainer>
+            <LinkContainer to={`/`}><ToastContainer position='bottom-center' draggable theme='colored' hideProgressBar/><SignOutButton /></LinkContainer>
             </PagesContainer>
             </>
            : 
@@ -69,15 +65,6 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                       </ListItemText>
                     </ListItemIcon>
                     </ListItemButton>
-                  </Link>
-                  <Link to='dentistries' smooth={true} offset={-110} duration={900}>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <ListItemText>
-                          Dentistries
-                      </ListItemText>
-                    </ListItemIcon>
-                  </ListItemButton>
                   </Link>
                   <Link to='appointments2' smooth={true} offset={-110} duration={900}>
                   <ListItemButton>

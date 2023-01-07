@@ -1,6 +1,7 @@
 import Paho from 'paho-mqtt';
 import { decrypt, encrypt } from '../utils/encryptionUtils';
 import { User } from '../pages/Authentication/UserType';
+import { toast } from 'react-toastify';
 // Create a client instance
 const client = new Paho.Client('cb9fe4f292fe4099ae5eeb9f230c8346.s2.eu.hivemq.cloud', Number(8884), `${Math.ceil(Math.random()*10000000)}`);
 
@@ -8,10 +9,10 @@ var appointments : any[];
 var deleteRes : any;
 var editRes : any;
 
-var login_response = '';
-var signup_response = '';
-var signout_response = '';
-var error_response = '';
+var login_response: string = '';
+var signup_response: string = '';
+var signout_response: string = '';
+var error_response: string = '';
 
 interface ApptToBeDeleted {
     userId: string;
@@ -54,6 +55,17 @@ export function getAppointments(id: string) : Promise<any[]> {
     return new Promise((resolve, reject) => {
         client.subscribe("get/appointments/response", {qos: 1});
         publish('get/appointments/request', `{"dentistId": "${id}"}`);
+        setTimeout(() => {
+            console.log(appointments);
+            resolve(appointments);
+        }, 400);
+    })
+}
+
+export function getUserAppointments(userId: string) : Promise<any[]> {
+    return new Promise((resolve, reject) => {
+        client.subscribe("user/appointments/response", {qos: 1});
+        publish('user/appointments/request', `{"userId": "${userId}"}`);
         setTimeout(() => {
             console.log(appointments);
             resolve(appointments);
@@ -114,6 +126,9 @@ export function onMessageArrived(message: any) {
         case 'delete/appointment/response':
             deleteRes = JSON.parse(message.payloadString);
             break;
+        case 'user/appointments/response':
+            appointments = JSON.parse(message.payloadString);
+            break;
         case 'edit/response':
             editRes = JSON.parse(message.payloadString);
             break;
@@ -140,12 +155,15 @@ export const getJWT = async () => {
         client.subscribe('authentication/signIn/response', { qos: 1 });
         try {
             setTimeout(() => {
-                const object = JSON.parse(login_response)
+                try {
+
+                    const object = JSON.parse(login_response)
                 if (object.isSuccess === true) {
                     if (object.data.jwtToken === 'null') {
                         alert('could not log in');
                         window.location.reload();
                     } else {
+                        toast.success("Log in successful!");
                         const encryptId = encrypt(object.data._id); // encrypting id in order to mae it harder to steal credentials
                         window.localStorage.setItem('ID', encryptId);
                         window.localStorage.setItem('TOKEN', object.data.jwtToken);
@@ -155,13 +173,16 @@ export const getJWT = async () => {
                      
                 } else if (object.isSuccess === false) {
                     const error_message = String(object.errors[0].detail); 
-                    alert(error_message);
+                    toast.error(error_message);
                 } 
-
-            }, 1000)
+                } catch (error) {
+                    toast.error("There are difficulties on our side, please try again later!")
+                }
+                
+            }, 500)
 
         } catch (error) {
-            alert('something went wrong, please try again.');
+            toast.error('something went wrong, please try again later!');
         }
       
     })
@@ -180,35 +201,21 @@ export const signOut = async () => {
                 try {
                     setTimeout(() => {
                         const object = JSON.parse(signout_response);
-    
                         if (object.isSuccess === true) {
+                            toast.success("You have been logged out!");
                             localStorage.clear();
                             window.location.reload();
                         } else if (object.isSuccess === false) {
                             const error_message = String(object.errors[0].detail);
-                            alert(error_message);
+                            toast.error(error_message);
                         }
-                    }, 300)
-                    
+                    }, 400)
                 } catch (error) {
                     console.log(error);
                 }
             })
     } catch (error) {
         console.log(error);
-    }
-}
-
-export const getError = async () => {
-    try {
-        return await new Promise(() => {
-            client.subscribe('error/response', {qos:1});
-            const error_parsed = JSON.parse(error_response);
-            console.log(error_response);
-        })
-
-    } catch (error) {
-        alert(error);
     }
 }
 
@@ -220,20 +227,26 @@ export const createUser = async (user: User) => {
             publish('authentication/signUp/request', encrypted_user.toString());
             
             setTimeout(() => {
-                const object = JSON.parse(signup_response);
-                const onSuccess = object.isSuccess;
-                if (onSuccess === false) {
-                    const error_message = String(object.errors[0].detail);
-                    alert(error_message);
-                } else if(onSuccess === true) {
-                    alert('User created sucessfully');
-                    window.location.assign('/');
+                try {
+                    const object = JSON.parse(signup_response);
+                    const onSuccess = object.isSuccess;
+                    
+                    if (onSuccess === false) {
+                        const error_message = String(object.errors[0].detail);
+                        toast.error(error_message);
+                    } else if(onSuccess === true) {
+                        toast.success('User created sucessfully');
+                        window.location.assign('/');
+                    } 
+                } catch (error) {
+                    toast.error("There are difficulties on our side, please try again later!");
                 }
+
             }, 500)
         })
 
     } catch (error) {
-        alert(error);
+        toast.error("Something went wrong, please try again!");
     }
     }
   
