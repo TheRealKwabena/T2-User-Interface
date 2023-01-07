@@ -88,12 +88,13 @@ const Map = (props: IMapViewProps) => {
                     <p>Name: {selectedDentistry.name}</p> 
                     <p>Address: {selectedDentistry.address}</p>
                     <hr/>   
-                    <p>Opening hours today: <br/><br/>{
-                    (new Date()).getDay()-1 > Object.values(selectedDentistry!.openinghours).length || ((new Date()).getDay()-1 < Object.values(selectedDentistry!.openinghours).length)? 
-                        `${Object.keys(selectedDentistry!.openinghours).at((new Date()).getDay()-1)?.charAt(0).toUpperCase()}${Object.keys(selectedDentistry!.openinghours).at((new Date()).getDay()-1)?.slice(1)}: ${Object.values(selectedDentistry!.openinghours).at((new Date()).getDay()-1)}` 
-                    : 
-                        'Closed'}</p>
-                    <button style={{marginTop: '0px', paddingBottom: '0px', fontSize: '18px', textAlign: 'center'}}onClick={() => props.currentView(dentistries.find(dentist => selectedDentistry.name === dentist.name)!.id)}>Book</button>
+                    <p>Opening hours:</p>
+                    <>{
+                    Object.keys(selectedDentistry!.openinghours).map((day, index) => (
+                        <p style={{fontSize: '15px', marginBottom: '2px'}}>{day?.charAt(0).toUpperCase()}{day?.slice(1)} : {Object.values(selectedDentistry!.openinghours).at(index)}</p>
+                    ))
+                    }</>
+                    <button style={{marginTop: '15px', paddingBottom: '0px', fontSize: '18px', textAlign: 'center'}}onClick={() => props.currentView(dentistries.find(dentist => selectedDentistry.name === dentist.name)!.id)}>Book</button>
                 </div>      
                 </>         
                 </InfoWindow>

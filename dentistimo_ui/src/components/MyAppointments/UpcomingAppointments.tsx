@@ -9,15 +9,6 @@ import Button from 'react-bootstrap/Button';
 import { dentistries } from '../../data/dentistries';
 
 function UpcomingAppointments() {
-  const [updateModal, setUpdateModal] = useState<any>({
-    isOpen: false,
-    dentistId: '',
-    requestId: '',
-    issuance: '',
-    oldDate: '',
-    date: '',
-    time: ''
-  });
   const [data, setData] = useState<any[]>([]);
   const [filterUpcoming, setFilterUpcoming] = useState<boolean>(true);
   const [deleteModal, setDeleteModal] = useState<any>({
@@ -70,56 +61,6 @@ function UpcomingAppointments() {
 
     return (
       <>
-        <Modal show={updateModal.isOpen} onHide={() => setUpdateModal({...updateModal, isOpen: false})}>
-            <form onSubmit={async (e) => {
-                        e.preventDefault()
-                        if (new Date(`${updateModal.date} ${updateModal.time}`) > new Date()) {
-                          await editAppointment({
-                            userId: rawUserId().toString(), 
-                            dentistId: updateModal.dentistId, 
-                            requestId: updateModal.requestId, 
-                            issuance: updateModal.issuance, 
-                            date: updateModal.oldDate, 
-                            editDate: `${updateModal.date} ${updateModal.time}`
-                          }).then((res) => {
-                            console.log('Edit successful.');
-                            setUpdateModal({...updateModal, isOpen: false, dentistId: '', requestId: '', issuance: '', oldDate: '', date: '', time: ''});
-                            return true;
-                          }).catch((e) => {
-                            console.log(e);
-                            setUpdateModal({...updateModal, isOpen: false, dentistId: '', requestId: '', issuance: '', oldDate: '', date: '', time: ''});
-                          })
-                        } else {
-                          return false;
-                        }
-                    }}>
-            <Modal.Header closeButton>
-                <Modal.Title>
-                    You would like to rebook your appointment for ...
-                </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Current Appointment: &nbsp;
-                <strong>{updateModal.oldDate.substring(0, updateModal.oldDate.length - 3)}</strong><hr/>
-                New Date: <input type="date" id='new-date' required min={`${new Date().toISOString()}`} value={updateModal.date} onChange={(e) => {
-                  setUpdateModal({...updateModal, date: e.target.value});
-                }}/>
-                <br/><br/>
-                New Time: <input type="text" required pattern='^(2[0-3]|[01][0-9]):([03]?[0])$' id='new-time' value={updateModal.time} onChange={(e) => {
-                  setUpdateModal({...updateModal, time: e.target.value});
-                }}/>
-            </Modal.Body>
-            <Modal.Footer>
-                <div id="button" style={{
-                    width: '100%',
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}>
-                    <Button type='submit' variant='success' size='sm'>Confirm</Button>
-                </div>
-            </Modal.Footer>
-            </form>
-        </Modal>
         <Modal show={deleteModal.isOpen} backdrop={true} onHide={() => setDeleteModal({...deleteModal, isOpen: false})}>
             <form onSubmit={async(e) => {
                         e.preventDefault()
@@ -160,12 +101,8 @@ function UpcomingAppointments() {
                 <td>{dentistries.find(d => d.id == value.dentistId)!.name}</td>
                 <td>{dateonly}</td>
                 <td>{timeonly}</td>
-                <td><BsFillTrashFill type="button" onClick={() => {
+                <td><BsFillTrashFill type="button" title='Unbook Appointment' onClick={() => {
                   setDeleteModal({...deleteModal, isOpen: true, id: value.dentistId, date: dateonly, time: timeonly});
-                }}/></td> 
-                <td><BsPencilFill type="button" onClick={() => {
-                  setUpdateModal({...updateModal, isOpen: true, dentistId: value.dentistId, requestId: value.requestId, issuance: value.issuance, oldDate: value.date.toString()});
-                  fetchUserApps(rawUserId().toString());
                 }}/></td>      
               </tr>) : (<></>)) 
               : 
@@ -175,10 +112,6 @@ function UpcomingAppointments() {
                 <td>{timeonly}</td>
                 <td><BsFillTrashFill type="button" onClick={async () => {
                   setDeleteModal({...deleteModal, isOpen: true, id: value.dentistId, date: dateonly, time: timeonly});
-                  fetchUserApps(rawUserId().toString());
-                }}/></td> 
-                <td><BsPencilFill type="button" onClick={() => {
-                  setUpdateModal({...updateModal, isOpen: true, dentistId: value.dentistId, requestId: value.requestId, issuance: value.issuance, oldDate: value.date.toString()});
                   fetchUserApps(rawUserId().toString());
                 }}/></td>      
                 </tr>)

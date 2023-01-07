@@ -155,7 +155,19 @@ const Dentistries: React.FC = () => {
                                         id="panel1a-header">
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
-                                    <p className='dentists'> Dentists: {dentistry.dentists}</p>
+                                    <p className='dentists'> Dentists: {dentistry.dentists} <br/></p>
+                                    <p>
+                                    <table>
+                                        <tr>
+                                        <th style={{paddingLeft: '150px', paddingRight: '25px'}}>Opening hours: &nbsp;&nbsp;</th>
+                                        {
+                                        Object.keys(dentistry.openinghours).map((day, index) => (
+                                            <>{day?.charAt(0).toUpperCase()}{day?.slice(1)}: {Object.values(dentistry.openinghours).at(index)}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</>
+                                        ))
+                                        }
+                                        </tr>
+                                    </table> 
+                                    </p>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
