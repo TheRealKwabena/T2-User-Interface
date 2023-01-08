@@ -5,39 +5,43 @@ import {Link} from 'react-scroll';
 import MenuIcon from '@mui/icons-material/Menu';
 import {Drawer, IconButton, List, ListItemButton, ListItemIcon, ListItemText, useMediaQuery} from '@mui/material';
 import '../styles.css';
+import SignOutButton from '../SignOutButton/SignOutButton';
+import { ToastContainer } from 'react-toastify';
 
 export interface IHeaderProps {}
 
 const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const reduced = useMediaQuery('(max-width: 690px)');
+  const token = localStorage.getItem('TOKEN');
 
   return (
     <Nav>
-      <LogoContainer to='/'>
-            <Logo src={require("./logo/image.png")} />
-      </LogoContainer>
-        { !reduced ? 
+      {token == null || token == undefined ?
+          <LogoContainer to='/'>
+            <img style={{width: 100}} src={require("./logo/image.png")} />
+          </LogoContainer>
+        :
+        <>
+          {!reduced ? 
+            <>
+              <LogoContainer to='/'>
+              <Logo src={require("./logo/image.png")} />
+            </LogoContainer>
             <PagesContainer>
-              <Link to='appointments' smooth={true} offset={-110} duration={900}>
-                <LinkContainer to={`/`}>
-                  Appointments
-                </LinkContainer>
-              </Link>
-              <Link to='dentistries' smooth={true} offset={-110} duration={900}>
-                <LinkContainer to={`/`}>
-                  Dentistries
-                </LinkContainer>
-              </Link>
-              <Link to='appointments2' smooth={true} offset={-110} duration={900}>
-                <LinkContainer to={`/`}>
-                  About
-                </LinkContainer>
-              </Link>
-              <LinkContainer to={`/login`}>
-                Login
+            <Link to='appointments' smooth={true} offset={-110} duration={900}>
+              <LinkContainer to={`/`}>
+              <a>Appointments</a>
               </LinkContainer>
+            </Link>
+            <Link to='appointments2' smooth={true} offset={-110} duration={900}>
+              <LinkContainer to={'/myslots'}>
+                MyBookings
+              </LinkContainer>
+            </Link>
+            <LinkContainer to={`/`}><ToastContainer position='bottom-center' draggable theme='colored' hideProgressBar/><SignOutButton /></LinkContainer>
             </PagesContainer>
+            </>
            : 
             <NavbarContainer>
               <div id='hamburger'>
@@ -62,20 +66,11 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                     </ListItemIcon>
                     </ListItemButton>
                   </Link>
-                  <Link to='dentistries' smooth={true} offset={-110} duration={900}>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <ListItemText>
-                          Dentistries
-                      </ListItemText>
-                    </ListItemIcon>
-                  </ListItemButton>
-                  </Link>
                   <Link to='appointments2' smooth={true} offset={-110} duration={900}>
                   <ListItemButton>
                     <ListItemIcon>
                       <ListItemText>
-                          About
+                          MyBookings
                       </ListItemText>
                     </ListItemIcon>
                   </ListItemButton>
@@ -83,6 +78,9 @@ const Header: React.FunctionComponent<IHeaderProps> = (props: IHeaderProps) => {
                 </List>
               </Drawer>
             </NavbarContainer>}
+        </>
+        }
+        
       </Nav>    
   )
 }

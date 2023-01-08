@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './Dentistries.css';
 import Map from '../../components/GoogleMapsApi/Map';
 import { dentistries } from '../../data/dentistries';
@@ -8,50 +8,90 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Typography from '@mui/material/Typography';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import FullCalendar, { DateSelectArg } from '@fullcalendar/react'
+import FullCalendar, { DateSelectArg, EventClickArg } from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { connectMQTT, publish } from '../../Infrastructure/PMQTTController';
-import Paho from 'paho-mqtt';
+import {getAppointments, deleteAppointment, publish, rawUserId} from '../../Infrastructure/PMQTTController';
+
+interface IFetchedSlot {
+    id?: string | undefined;
+    title?: string;
+    start: Date | string;
+    end: Date | string;
+    display: string;
+    color: string;
+}
+
+interface IAppInfo {
+    slot: DateSelectArg | undefined;
+    id: string | undefined;
+}
 
 const Dentistries: React.FC = () => {
-    window.Buffer = window.Buffer || require("buffer").Buffer;
     const [modalOpen, setModalOpen] = useState(false);
     const [bookingConfirmed, setBookingConfirmed] = useState(true);
-    const [appointmentInfo, setAppointmentInfo] = useState<DateSelectArg | undefined>(undefined);
+    const [appointmentInfo, setAppointmentInfo] = useState<IAppInfo>({slot: undefined, id: undefined});
     const [eventTitle, setEventTitle] = useState<string>('');
+    const [id, setId] = useState<string>('');
     
     useEffect(() => {
         try {
-            connectMQTT();
+            console.log(Math.ceil(Math.random()*10000000));
         } catch (e) {
-            console.log(e);
+            console.log('---');
         }
-    })
+    }, []);
 
-    const createAppointment = async (selectInfo: DateSelectArg | undefined) => {
-        console.log('creating appointment ...')
-        if (selectInfo !== undefined) {
-            console.log(`${bookingConfirmed} should be true`)
-            const onSlotSelect = selectInfo.view.calendar
+    const createAppointment = (selectInfo: IAppInfo) => {
+        if (selectInfo.slot !== undefined && selectInfo.id !== undefined) {
+            const onSlotSelect = selectInfo.slot.view.calendar
             if (bookingConfirmed) {
                 let desiredEvent = {
-                    userId: '1274187', //authentication should add it in
+                    userId: rawUserId().toString(), //authentication should add it in 
                     requestId: '10',   //to be replaced by guid
-                    dentistId: '1',    //to be replaced by fetching dentistry info
+                    dentistId: selectInfo.id,    //to be replaced by fetching dentistry info
                     issuance: Math.floor((Math.random() * 100) + 1).toString(),
-                    date: selectInfo.startStr
+                    date: selectInfo.slot.startStr
                 };
-                onSlotSelect.addEvent(desiredEvent);
-                publish('appointment/request', JSON.stringify(desiredEvent));
+                publish('authentication/appointment/request', JSON.stringify(desiredEvent));
+                setTimeout(() => onSlotSelect.refetchEvents(), 500);
             } else {
-                onSlotSelect.unselect()
+                console.log('Nothing selected.')
             }
+            setTimeout(() => onSlotSelect.refetchEvents(), 500);
         }
+    }
+
+    const fetchSlots = async (id: string) : Promise<any[]> => {
+            let list : IFetchedSlot[] = [];
+            await getAppointments(id)
+            .then((val) => {
+                list = val.map((value) => {
+                    const startDate = new Date(value.date.toString());
+                    const endDate = new Date(startDate.getTime() + 30*60000);
+                    return {
+                        title: value.userId === rawUserId() ? 'Your Appointment' : 'Appointment',
+                        start: startDate.toISOString(),
+                        end: endDate.toISOString(),
+                        display: 'background',
+                        color: value.userId === rawUserId() ? 'rgba(0,0,220,0.5)' : 'grey',
+                    }
+                });
+                console.log(list);
+            }).catch((e) => {
+                console.log(e);
+            })
+            //console.log(list);
+            return list;
+    }
+
+    const currentDentistry = (id: string) => {
+        setId(id);
     }
     
     return (
@@ -59,10 +99,7 @@ const Dentistries: React.FC = () => {
                 <div className='title'>
                     Our Dentistries
                 </div>
-                    <div className='search_bar_container'>
-                        <SearchBar />
-                    </div>
-                    <Map />
+                    <Map currentView={currentDentistry}/>
                     <div className='dentistry_container'>
                         <Modal show={modalOpen} onHide={() => setModalOpen(false)}>
                             <form onSubmit={(e) => {
@@ -71,7 +108,9 @@ const Dentistries: React.FC = () => {
                                         setBookingConfirmed(true)
                                         createAppointment(appointmentInfo)
                                         setEventTitle('')
-                                        setTimeout(() => setModalOpen(false), 200);
+                                        setTimeout(() => {
+                                            setModalOpen(false);
+                                        }, 300);
                                     }}>
                             <Modal.Header closeButton>
                                 <Modal.Title>
@@ -81,12 +120,16 @@ const Dentistries: React.FC = () => {
                             <Modal.Body>
                                 {/*Please mention the times. 
                                 (Need to add input boxes, one is disabled, that is 30mins + start).*/}
-                                Name: <input type="text" name="Name" id="" required placeholder='Name' value={eventTitle} onChange={(e) => {
-                                    setEventTitle(e.target.value)
-                                }}/>
-                                <br></br><br></br>
-                                Start Time: <input type="time" name="StartTime" id='start-time' /*onChange={}*//>
-                                End Time: <input type="time" name="EndTime" id='end-time' /*onChange={}*//>
+                                Start Time: <strong>{appointmentInfo.slot?.startStr.substring(0, 16).replace('T', ' ')}</strong>
+                                <br></br>
+                                End Time: <strong>{appointmentInfo.slot?.endStr.substring(0, 16).replace('T', ' ')}</strong>
+                                <br></br><br/>
+                                <Form.Check
+                                    required 
+                                    type={'checkbox'}
+                                    id={`default-check`}
+                                    label={'I agree to book the above date and time selected.'}
+                                />
                             </Modal.Body>
                             <Modal.Footer>
                                 <div id="button" style={{
@@ -94,81 +137,101 @@ const Dentistries: React.FC = () => {
                                     display: 'flex',
                                     justifyContent: 'center'
                                 }}>
-                                    <Button type='submit' variant='success' size='sm'>Confirm Appointment</Button>
+                                    <Button type='submit' variant='success' size='sm' style={{textAlign: 'center', height: 'auto', marginTop: '0px'}}>Confirm Appointment</Button>
                                 </div>
                             </Modal.Footer>
                             </form>
                         </Modal>
                         {
                             dentistries.map((dentistry: any, index: number) => (
-                                <Accordion id='accordion' TransitionProps={{ unmountOnExit: true }}>
+                                <Accordion id='accordion' key={dentistry.id} hidden={id !== dentistry.id} TransitionProps={{ 
+                                    unmountOnExit: true, 
+                                }} onChange={() => {
+                                    setId(dentistry.id);
+                                }}>
                                     <AccordionSummary
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
-                                        id="panel1a-header"
-                                        >
+                                        id="panel1a-header">
                                     <p className='name'> Name: {dentistry.name}</p>
                                     <p className='address'> Address: {dentistry.address}</p>
-                                    <p className='dentists'> Dentists: {dentistry.dentists}</p>
+                                    <p className='dentists'> Dentists: {dentistry.dentists} <br/></p>
+                                    <p>
+                                    <table>
+                                        <tr>
+                                        <th style={{paddingLeft: '150px', paddingRight: '25px'}}>Opening hours: &nbsp;&nbsp;</th>
+                                        {
+                                        Object.keys(dentistry.openinghours).map((day, index) => (
+                                            <>{day?.charAt(0).toUpperCase()}{day?.slice(1)}: {Object.values(dentistry.openinghours).at(index)}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</>
+                                        ))
+                                        }
+                                        </tr>
+                                    </table> 
+                                    </p>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                     <Typography>
                                             
                                     <FullCalendar
                                         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                                        rerenderDelay={900}
                                         headerToolbar={{
                                             left: 'prev,next today',
                                             center: 'title',
                                             right: 'timeGridWeek,timeGridDay'
                                         }}
                                         dateClick={() => createAppointment}
-                                        initialView='timeGridDay'
+                                        initialEvents={[]}
+                                        loading={(isLoading) => {
+                                            if (isLoading) {
+                                                console.log('Loading .........')
+                                            } else {
+                                                console.log('Done!');
+                                            }
+                                        }}
+                                        initialView='timeGridWeek'
                                         selectable={true}
-                                        selectMirror={true}
-                                        editable={false}
+                                        selectMirror={false}
+                                        editable={true}
+                                        eventClick={async (eventInfo) => {
+                                            eventInfo.view.calendar.unselect();
+                                            //more info about event maybe...
+                                        }}
                                         dayMaxEvents={true}
-                                        initialEvents={dentistry.appointments}
                                         select={(info) => {
-                                            setAppointmentInfo(info)
+                                            setAppointmentInfo({...appointmentInfo, slot: info, id: dentistry.id})
                                             setModalOpen(true)
+                                            info.view.calendar.refetchEvents();
                                         }}
-                                        selectConstraint={{
-                                            end: '00:30:00'
-                                        }}
+                                        selectConstraint={'businessHours'}
                                         eventOverlap={false}
                                         allDaySlot={false}
-                                        slotMinTime={'08:00:00'}
-                                        slotMaxTime={'17:00:00'}
+                                        slotMinTime={'06:00:00'}
                                         weekends={false}
                                         defaultTimedEventDuration={'00:30'}
                                         selectAllow={(info) => {
-                                            if (info.end.getTime() - info.start.getTime() <= (30 * 60 * 1000)) {
+                                            if ((info.start > new Date()) && (info.end.getTime() - info.start.getTime() <= (30 * 60 * 1000))) {
                                                 return true
                                             } else {
                                                 return false
                                             }
                                         }}
                                         forceEventDuration={true}
-                                        eventSources={[
-                                            {
-                                                events: [{
-                                                    id: 'lunch',           //to be adjusted later:
-                                                    startTime: '11:00:00', //should be made flexible to the dentist's comfort
-                                                    endTime: '12:00:00',
-                                                    daysOfWeek: ['1', '2', '3', '4', '5'],
-                                                    display: 'background'
-                                                }],
-                                                constraint: {
-                                                    //need to somehow check if length of appointment is strictly
-                                                    //30 minutes, no longer
-                                                }
-                                            }  
-                                        ]}
+                                        lazyFetching={false}
+                                        events={async () => await fetchSlots(id)}
                                         selectOverlap={(event) => {
                                             return event.display === 'inverse-background';
                                         }}
+                                        businessHours={
+                                            Object.keys(dentistry.openinghours).map((day, index) => (
+                                            {
+                                                daysOfWeek: [index+1],
+                                                startTime: (dentistry.openinghours[day].split('-'))[0],
+                                                endTime: (dentistry.openinghours[day].split('-'))[1],
+                                                display: 'inverse-background'
+                                            }
+                                        ))}
                                     /> 
-
                                     </Typography>
                                     </AccordionDetails>
                                 </Accordion>
