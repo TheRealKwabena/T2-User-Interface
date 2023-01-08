@@ -167,8 +167,8 @@ export const getJWT = async () => {
                         const encryptId = encrypt(object.data._id); // encrypting id in order to mae it harder to steal credentials
                         window.localStorage.setItem('ID', encryptId);
                         window.localStorage.setItem('TOKEN', object.data.jwtToken);
-                        window.location.replace("/");
                         client.unsubscribe('authentication/signIn/response')
+                        window.location.replace("/");
                     }
                      
                 } else if (object.isSuccess === false) {
@@ -188,7 +188,10 @@ export const getJWT = async () => {
     })
 }
 
-
+// the signOut method signs user out by decrypting their id from localstorage,
+// then encrypting that id in an object form and publishing to sign out request topic
+// and then on successful response clears the localstorage completely and sign user out
+// or displays an error in toast error message.
 export const signOut = async () => {
     try {
         return new Promise(() => {
@@ -203,6 +206,7 @@ export const signOut = async () => {
                         const object = JSON.parse(signout_response);
                         if (object.isSuccess === true) {
                             toast.success("You have been logged out!");
+                            client.unsubscribe('authentication/signOut/response');
                             localStorage.clear();
                             window.location.reload();
                         } else if (object.isSuccess === false) {
@@ -211,14 +215,18 @@ export const signOut = async () => {
                         }
                     }, 400)
                 } catch (error) {
-                    console.log(error);
+                    toast.error("Something went wrong, please try again later!");
                 }
             })
     } catch (error) {
-        console.log(error);
+        toast.error("Something went wrong, please try again later!");
     }
 }
 
+// the method createUser takes in credentials that are entered in sign up form
+// encryptes them, and sends to sign up request topic
+// then waits 0.5 seconds and either returns an error message from the backend, or returns success and
+// a successful toast message.
 export const createUser = async (user: User) => {
     try {
         return await new Promise(() => {
@@ -237,6 +245,7 @@ export const createUser = async (user: User) => {
                     } else if(onSuccess === true) {
                         toast.success('User created sucessfully');
                         window.location.assign('/');
+                        client.unsubscribe('authentication/signUp/response');
                     } 
                 } catch (error) {
                     toast.error("There are difficulties on our side, please try again later!");
@@ -248,7 +257,23 @@ export const createUser = async (user: User) => {
     } catch (error) {
         toast.error("Something went wrong, please try again!");
     }
+}
+
+// The login method encrypts the user credentials that are entered in the login form,
+// publishes that encrypted hash to sign in request, clears localstorage and receives the jwt token from
+// the backend.
+export const logIn = async (user: User) => {
+    try {
+      const encrypted_user = encrypt(user);
+      publish('authentication/signIn/request', encrypted_user.toString());
+      localStorage.clear();
+      getJWT();
+
+    } catch (error) {
+        toast.error("Something went wrong, please try again!");
     }
+  }
+
   
 
 /**

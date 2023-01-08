@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import "./Login.css";
-import { connectMQTT, publish, getJWT } from '../../Infrastructure/PMQTTController';
-import { encrypt, decrypt } from "../../utils/encryptionUtils";
+import { connectMQTT, logIn } from '../../Infrastructure/PMQTTController';
 import { User } from './UserType';
 import { useForm } from 'react-hook-form';
-import { EMAIL_REGEX, PASSWORD_REGEX } from './Regex';
-import { ToastContainer, toast } from 'react-toastify';
+import { EMAIL_REGEX } from './Regex';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 interface LoginPageProps {
   pageName: string;
@@ -16,8 +15,6 @@ interface LoginPageProps {
 }
 
 const Login = (props: LoginPageProps) => {
-  const [onLoad, setOnLoad] = useState(false);
-  const SIGN_IN_REQUEST_TOPIC = 'authentication/signIn/request';
   const { register, handleSubmit, formState: { errors } } = useForm<User>();
   
   useEffect(() => { document.title = `${props.pageName} ⋅ Dentistimo` });
@@ -30,17 +27,6 @@ const Login = (props: LoginPageProps) => {
     }
   })
 
-  const logIn = async (user: User) => {
-    try {
-      const encrypted_user = encrypt(user);
-      publish(SIGN_IN_REQUEST_TOPIC, encrypted_user.toString());
-      localStorage.clear();
-      getJWT();
-
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   return (
     <form className="login-form" onSubmit={handleSubmit(logIn)}>
