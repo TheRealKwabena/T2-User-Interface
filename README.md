@@ -1,4 +1,4 @@
-# Welcome to Dentistimo Project!
+# Welcome to T2 User Interface of Dentistimo Project!
 
 ## DIT356 Mini Project: Distributed Systems
 
@@ -55,5 +55,6 @@ The system will be event driven, using the publish/subscribe model. This means t
 # Conceptual design mapping
 
 Our system consists of frontend and backend subsystems, in which messages to and from the subsystems are sent over MQTT using publish/subscribe to transfer the data, and get filtered through a gateway. Once the required filtering and processing has occurred, the subsystem that requested data to be processed will handle the data.
+For a more detailed look of our Project Design [check our presentation on Slideshare](https://www.slideshare.net/slideshow/embed_code/key/FvIav4wG9BAMi5?hostedIn=slideshare&page=upload):
 
 <br>
