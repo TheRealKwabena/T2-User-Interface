@@ -1,11 +1,12 @@
 .contain{
     margin-top: 170px;
       color: white;
-      width: 40%;
+      width: 88.5%;
       margin-left: 50px;
-      background:#5FC1AA;
+      background:#5fc1aac0;
       border-radius: 10px;
       text-align: center;
+      border: 1.5px solid rgba(0, 0, 0, 0.2);
       color: white;
     
   
@@ -25,5 +26,4 @@
   justify-content: center;
   align-items: center;
   margin-left: 100px;
-  width: 80%;
 }
